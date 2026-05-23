@@ -1,0 +1,15 @@
+<view wx:if="{{!isLoad}}" class="margin-top load loading text-l text-grey"></view>
+
+<view class="main-admin" wx:if="{{isAdmin&&isLoad}}">
+	<view class="form-box shadow">
+		<view class="form-group">
+			<view class="title">Webhook 地址</view>
+			<textarea maxlength="500" placeholder="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=..." placeholder-class="phc" model:value="{{formWebhookUrl}}" focus="{{formWebhookUrlFocus}}" auto-height="{{true}}"></textarea>
+		</view>
+		<view wx:if="{{formWebhookUrlFocus}}" class="hint-desc error">{{formWebhookUrlFocus}}</view>
+		<view class="hint">不配置也不影响小程序上线使用；配置后每日档期会按定时器推送到企业微信群。</view>
+	</view>
+
+	<button bindtap="bindFormSubmit" class="btn-admin margin-top">保存配置</button>
+	<button bindtap="bindTestTap" class="btn-admin plain margin-top-xs">测试发送今天档期</button>
+</view>

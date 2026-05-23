@@ -1,0 +1,14 @@
+@import '../../../../../../style/public/admin.wxss';
+
+.form-box .hint {
+	padding: 0 30rpx 30rpx;
+	font-size: 26rpx;
+	line-height: 1.7;
+	color: #888;
+}
+
+.btn-admin.plain {
+	background: #fff;
+	color: var(--adminColor);
+	border: 1rpx solid var(--adminColor);
+}
