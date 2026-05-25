@@ -8,6 +8,7 @@ const util = require('../utils/util.js');
 const dataUtil = require('../utils/data_util.js');
 
 const cloudBase = require('../cloud/cloud_base.js');
+const REGEX_KEYWORD_MAX_LEN = 64;
 const MAX_RECORD_SIZE = 1000; //数据库每次可取最大记录数 在小程序端默认及最大上限为 20，在云函数端默认及最大上限为 1000
 const DEFAULT_RECORD_SIZE = 20; //默认显示记录数
 
@@ -21,6 +22,25 @@ const dbAggr = dbCmd.aggregate; // 聚合
 // 获得一个命令操作
 function getCmd() {
 	return dbCmd;
+}
+
+function normalizeRegexKeyword(keyword, maxLen = REGEX_KEYWORD_MAX_LEN) {
+	if (!util.isDefined(keyword)) return '';
+
+	keyword = String(keyword).trim();
+	if (!keyword) return '';
+
+	if (keyword.length > maxLen) keyword = keyword.substring(0, maxLen);
+	return keyword;
+}
+
+function escapeRegex(keyword) {
+	return String(keyword).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function fmtRegexKeyword(keyword, maxLen = REGEX_KEYWORD_MAX_LEN) {
+	keyword = normalizeRegexKeyword(keyword, maxLen);
+	return keyword ? escapeRegex(keyword) : '';
 }
 
 /**
@@ -1015,7 +1035,8 @@ function fmtWhereSimple(arr) {
 			where = dbCmd.gte(val);
 			break;
 		case 'like':
-			if (!util.isDefined(val) || !val) break; //无条件不搜索
+			val = fmtRegexKeyword(val);
+			if (!val) break; //无条件不搜索
 			where = {
 				$regex: val,
 				$options: 'i'
@@ -1038,6 +1059,8 @@ function fmtWhereSimple(arr) {
 
 module.exports = {
 	getCmd,
+	escapeRegex,
+	fmtRegexKeyword,
 
 	insert,
 	insertBatch,

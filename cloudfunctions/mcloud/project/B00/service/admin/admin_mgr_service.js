@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Notes: 管理员管理
  * Ver : CCMiniCloud Framework 2.0.1 ALL RIGHTS RESERVED BY cclinux0730 (wechat)
  * Date: 2025-07-11 07:48:00 
@@ -10,7 +10,6 @@ const dataUtil = require('../../../../framework/utils/data_util.js');
 const timeUtil = require('../../../../framework/utils/time_util.js');
 const AdminModel = require('../../../../framework/platform/model/admin_model.js');
 const LogModel = require('../../../../framework/platform/model/log_model.js');
-const md5Lib = require('../../../../framework/lib/md5_lib.js');
 
 class AdminMgrService extends BaseProjectAdminService {
 
@@ -20,18 +19,17 @@ class AdminMgrService extends BaseProjectAdminService {
 		// 判断是否存在
 		let where = {
 			ADMIN_STATUS: 1,
-			ADMIN_NAME: name,
-			ADMIN_PASSWORD: md5Lib.md5(password)
+			ADMIN_NAME: name
 		}
-		let fields = 'ADMIN_ID,ADMIN_NAME,ADMIN_DESC,ADMIN_TYPE,ADMIN_LOGIN_TIME,ADMIN_LOGIN_CNT';
+		let fields = '_id,ADMIN_ID,ADMIN_NAME,ADMIN_PASSWORD,ADMIN_DESC,ADMIN_TYPE,ADMIN_LOGIN_TIME,ADMIN_LOGIN_CNT';
 		let admin = await AdminModel.getOne(where, fields);
-		if (!admin)
+		if (!admin || !dataUtil.verifyPassword(password, admin.ADMIN_PASSWORD))
 			this.AppError('管理员不存在或者已停用');
 
-		let cnt = admin.ADMIN_LOGIN_CNT;
+		let cnt = admin.ADMIN_LOGIN_CNT || 0;
 
 		// 生成token
-		let token = dataUtil.genRandomString(32);
+		let token = dataUtil.genRandomString(64);
 		let tokenTime = timeUtil.time();
 		let data = {
 			ADMIN_TOKEN: token,
@@ -39,7 +37,10 @@ class AdminMgrService extends BaseProjectAdminService {
 			ADMIN_LOGIN_TIME: timeUtil.time(),
 			ADMIN_LOGIN_CNT: cnt + 1
 		}
-		await AdminModel.edit(where, data);
+		if (dataUtil.needsPasswordHashUpgrade(admin.ADMIN_PASSWORD)) {
+			data.ADMIN_PASSWORD = dataUtil.hashPassword(password);
+		}
+		await AdminModel.edit(admin._id, data);
 
 		let type = admin.ADMIN_TYPE;
 		let last = (!admin.ADMIN_LOGIN_TIME) ? '尚未登录' : timeUtil.timestamp2Time(admin.ADMIN_LOGIN_TIME);
@@ -203,15 +204,22 @@ class AdminMgrService extends BaseProjectAdminService {
 	async pwdtMgr(adminId, oldPassword, password) {
 
 		let where = {
-			_id: adminId,
-			ADMIN_PASSWORD: md5Lib.md5(oldPassword),
+			_id: adminId
 		}
-		let admin = await AdminModel.getOne(where);
-		if (!admin)
+		let admin = await AdminModel.getOne(where, '_id,ADMIN_PASSWORD');
+		if (!admin || !dataUtil.verifyPassword(oldPassword, admin.ADMIN_PASSWORD))
 			this.AppError('旧密码错误');
 
+		try {
+			dataUtil.assertStrongPassword(password);
+		} catch (err) {
+			this.AppError('新密码强度不足：' + err.message);
+		}
+
 		let data = {
-			ADMIN_PASSWORD: md5Lib.md5(password),
+			ADMIN_PASSWORD: dataUtil.hashPassword(password),
+			ADMIN_TOKEN: '',
+			ADMIN_TOKEN_TIME: 0,
 		}
 		return await AdminModel.edit(adminId, data);
 	}

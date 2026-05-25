@@ -1,0 +1,44 @@
+<view class="page" wx:if="{{data}}">
+	<picker mode="date" fields="month" value="{{month}}" bindchange="bindMonthChange">
+		<view class="month">{{month}}</view>
+	</picker>
+
+	<view class="summary">
+		<view>
+			<text>本月预计结算</text>
+			<view>{{data.payableTotal}}</view>
+		</view>
+		<view>
+			<text>调整金额</text>
+			<view>{{data.adjustmentTotal}}</view>
+		</view>
+		<view>
+			<text>已结算</text>
+			<view>{{data.settledTotal}}</view>
+		</view>
+	</view>
+
+	<view class="section">本月预计结算</view>
+	<view wx:if="{{data.payable.length==0}}" class="empty">暂无</view>
+	<view wx:for="{{data.payable}}" wx:key="orderId" class="card">
+		<view class="title">{{item.typeName}}｜{{item.customerName}}</view>
+		<view class="meta">{{item.date}} · {{item.roleName}}</view>
+		<view class="amount">{{item.amount}}</view>
+	</view>
+
+	<view class="section">调整金额</view>
+	<view wx:if="{{data.adjustments.length==0}}" class="empty">暂无</view>
+	<view wx:for="{{data.adjustments}}" wx:key="id" class="card">
+		<view class="title">{{item.typeName}}｜{{item.customerName}}</view>
+		<view class="meta">{{item.reason}}</view>
+		<view class="amount">{{item.amount}}</view>
+	</view>
+
+	<view class="section">剩余预计入账</view>
+	<view wx:if="{{data.estimated.length==0}}" class="empty">暂无</view>
+	<view wx:for="{{data.estimated}}" wx:key="orderId" class="card">
+		<view class="title">{{item.typeName}}｜{{item.customerName}}</view>
+		<view class="meta">{{item.date}} · {{item.progressDesc}} · {{item.roleName}}</view>
+		<view class="amount muted">{{item.amount}}</view>
+	</view>
+</view>

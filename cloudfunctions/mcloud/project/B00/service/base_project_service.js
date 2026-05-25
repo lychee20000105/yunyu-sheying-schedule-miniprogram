@@ -5,11 +5,13 @@
 
 const dbUtil = require('../../../framework/database/db_util.js');
 const util = require('../../../framework/utils/util.js');
+const dataUtil = require('../../../framework/utils/data_util.js');
 const AdminModel = require('../../../framework/platform/model/admin_model.js');
 const NewsModel = require('../model/news_model.js');
 const MeetModel = require('../model/meet_model.js');
 const AlbumModel = require('../model/album_model.js');
 const ProductModel = require('../model/product_model.js');
+const WorkTypeModel = require('../model/work_type_model.js');
 const BaseService = require('../../../framework/platform/service/base_service.js');
 const setupUtil = require('../../../framework/utils/setup/setup_util.js');
 
@@ -18,18 +20,76 @@ class BaseProjectService extends BaseService {
 		return util.getProjectId();
 	}
 
+	getInitialAdminPassword() {
+		const envNames = ['B00_ADMIN_INIT_PASSWORD', 'ADMIN_INIT_PASSWORD'];
+		for (let k in envNames) {
+			let password = process.env[envNames[k]];
+			if (password) {
+				try {
+					dataUtil.assertStrongPassword(password);
+				} catch (err) {
+					this.AppError('Initial admin password is too weak: ' + err.message);
+				}
+				return {
+					password,
+					source: envNames[k]
+				};
+			}
+		}
+
+		return {
+			password: dataUtil.genStrongPassword(24),
+			source: 'generated'
+		};
+	}
+
 	async initSetup() {
 
-		const COLLECTIONS = 'bx_admin|bx_day|bx_join|bx_log|bx_meet|bx_news|bx_product|bx_album|bx_fav|bx_user';
+		const SETUP_DONE_KEY = 'B00_INIT_SETUP_DONE';
+		const COLLECTIONS = 'bx_admin|bx_day|bx_join|bx_log|bx_meet|bx_news|bx_product|bx_album|bx_fav|bx_user|bx_work_staff|bx_work_type|bx_work_order|bx_work_note|bx_work_item|bx_work_rest|bx_work_message|bx_work_payroll|bx_work_customer';
+		const WORK_COLLECTIONS = 'bx_work_staff|bx_work_type|bx_work_order|bx_work_note|bx_work_item|bx_work_rest|bx_work_message|bx_work_payroll|bx_work_customer';
 		const CONST_PIC = '/images/cover.gif';
 
 		const NEWS_CATE = '1=本店动态,2=拍摄小贴士';
 		const MEET_TYPE = '1=生日跟拍,2=百日宴,3=婚礼跟拍,4=订婚宴,5=寿宴,6=乔迁跟拍,7=写真,8=外景约拍,9=活动商拍,10=艺术肖像,11=其他拍摄';
 		const ALBUM_CATE = '1=跟拍纪实,2=艺术肖像,3=写真作品,4=外景约拍,5=活动商拍';
 		const PRODUCT_CATE = '1=拍摄服务';
+		const WORK_TYPES = [
+			['跟拍', '#d9001b'], ['生日跟拍', '#ff7a70'], ['百日宴', '#ff8a00'], ['婚礼跟拍', '#d9001b'],
+			['订婚宴', '#bf2bd6'], ['寿宴跟拍', '#c43ac9'], ['乔迁跟拍', '#e85d04'], ['活动跟拍', '#d9001b'],
+			['内景写真', '#2f6f4e'], ['外景写真', '#2f6df6'], ['艺术肖像', '#9c27b0'], ['商拍', '#9b6bc7'],
+			['亲子照', '#c12bd4'], ['证件照', '#a57ad1'], ['化妆', '#92008d'], ['摄像', '#0052cc'],
+			['选片', '#00a3a3'], ['其他', '#49cdbf', 1]
+		];
 
+		if (!await dbUtil.isExistCollection('bx_setup')) {
+			await dbUtil.createCollection('bx_setup');
+		}
+		if (await setupUtil.get(SETUP_DONE_KEY)) return;
+
+		let workArr = WORK_COLLECTIONS.split('|');
+		for (let k in workArr) {
+			if (!await dbUtil.isExistCollection(workArr[k])) {
+				await dbUtil.createCollection(workArr[k]);
+			}
+		}
+		if (await dbUtil.isExistCollection('bx_work_type')) {
+			let typeCnt = await WorkTypeModel.count({});
+			if (typeCnt == 0) {
+				for (let i = 0; i < WORK_TYPES.length; i++) {
+					await WorkTypeModel.insert({
+						TYPE_NAME: WORK_TYPES[i][0],
+						TYPE_COLOR: WORK_TYPES[i][1],
+						TYPE_ORDER: i + 1,
+						TYPE_IS_OTHER: WORK_TYPES[i][2] || 0,
+						TYPE_STATUS: 1
+					});
+				}
+			}
+		}
 
 		if (await dbUtil.isExistCollection('bx_setup_b00')) {
+			await setupUtil.set(SETUP_DONE_KEY, true);
 			return;
 		}
 
@@ -45,12 +105,18 @@ class BaseProjectService extends BaseService {
 		if (await dbUtil.isExistCollection('bx_admin')) {
 			let adminCnt = await AdminModel.count({});
 			if (adminCnt == 0) {
+				let initAdminPassword = this.getInitialAdminPassword();
 				let data = {};
 				data.ADMIN_NAME = 'admin';
-				data.ADMIN_PASSWORD = 'e10adc3949ba59abbe56e057f20f883e';
+				data.ADMIN_PASSWORD = dataUtil.hashPassword(initAdminPassword.password);
 				data.ADMIN_DESC = '超管';
 				data.ADMIN_TYPE = 1;
 				await AdminModel.insert(data);
+				if (initAdminPassword.source == 'generated') {
+					console.warn('### initSetup created admin with a generated temporary password. Set B00_ADMIN_INIT_PASSWORD before first deployment; the generated value is not printed.');
+				} else {
+					console.log('### initSetup created admin with password from ' + initAdminPassword.source + '.');
+				}
 			}
 		}
 
@@ -157,10 +223,6 @@ class BaseProjectService extends BaseService {
 			}
 		}
 
-		if (!await dbUtil.isExistCollection('bx_setup')) {
-			await dbUtil.createCollection('bx_setup');
-		}
-
 		const aboutContent = [
 			{ type: 'text', val: '云屿摄影，专注县城多场景拍摄服务。' },
 			{ type: 'text', val: '我们主要承接生日跟拍、百日宴、婚礼跟拍、订婚宴、寿宴、乔迁跟拍、写真、外景约拍、活动商拍和艺术肖像等拍摄。' },
@@ -168,6 +230,7 @@ class BaseProjectService extends BaseService {
 			{ type: 'text', val: '技术由云屿科技支撑。' }
 		];
 		await setupUtil.set('SETUP_ABOUT_KEY', aboutContent);
+		await setupUtil.set(SETUP_DONE_KEY, true);
 	}
 
 }

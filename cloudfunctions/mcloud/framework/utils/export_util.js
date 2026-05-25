@@ -9,6 +9,7 @@ const cloudUtil = require('../../framework/cloud/cloud_util.js');
 const timeUtil = require('../../framework/utils/time_util.js');
 const util = require('../../framework/utils/util.js');
 const md5Lib = require('../../framework/lib/md5_lib.js');
+const AppError = require('../../framework/core/app_error.js');
 const config = require('../../config/config.js');
 const setupUtil = require('../utils/setup/setup_util.js');
 
@@ -46,13 +47,19 @@ async function deleteDataExcel(key) {
 	console.log('[deleteExcel]  path = ' + xlsPath);
 
 	const cloud = cloudBase.getCloud();
-	await cloud.deleteFile({
-		fileList: [xlsPath],
-	}).then(async res => {
-		console.log(res.fileList);
-		if (res.fileList && res.fileList[0] && res.fileList[0].status == -503003) {
-			console.log('[deleteUserExcel]  ERROR = ', res.fileList[0].status + ' >> ' + res.fileList[0].errMsg);
-			this.AppError('文件不存在或者已经删除');
+	try {
+		let res = await cloud.deleteFile({
+			fileList: [xlsPath],
+		});
+
+		console.log(res && res.fileList);
+		let fileResult = res && res.fileList && res.fileList[0];
+		if (!fileResult || fileResult.status != 0) {
+			let status = fileResult ? fileResult.status : 'EMPTY_RESULT';
+			let errMsg = fileResult && fileResult.errMsg ? fileResult.errMsg : '删除导出文件失败';
+			console.log('[deleteUserExcel]  ERROR = ', status + ' >> ' + errMsg);
+			if (status == -503003) throw new AppError('文件不存在或者已经删除');
+			throw new AppError('操作失败，请重新删除');
 		}
 
 		// 删除导出数据记录
@@ -60,14 +67,12 @@ async function deleteDataExcel(key) {
 
 		console.log('[deleteExcel]  OVER.');
 
-	}).catch(error => {
-		if (error.name != 'AppError') {
-			console.log('[deleteExcel]  ERROR = ', error);
-			this.AppError('操作失败，请重新删除');
-		} else
-			throw error;
-	});
+	} catch (error) {
+		if (error && error.name == 'AppError') throw error;
 
+		console.log('[deleteExcel]  ERROR = ', error);
+		throw new AppError('操作失败，请重新删除');
+	}
 
 }
 

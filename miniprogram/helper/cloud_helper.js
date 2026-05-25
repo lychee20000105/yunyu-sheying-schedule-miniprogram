@@ -116,6 +116,13 @@ function callCloud(route, params = {}, options) {
 				params
 			},
 			success: function (res) {
+				if (!res || !res.result || !helper.isDefined(res.result.code)) {
+					reject(res || {
+						errMsg: 'callFunction result empty'
+					});
+					return;
+				}
+
 				if (res.result.code == CODE.LOGIC || res.result.code == CODE.DATA) {
 					console.log(res)
 					// 逻辑错误&数据校验错误 
@@ -134,7 +141,7 @@ function callCloud(route, params = {}, options) {
 					wx.reLaunch({
 						url: pageHelper.fmtURLByPID('/pages/admin/index/login/admin_login'),
 					});
-					//reject(res.result);
+					reject(res.result);
 					return;
 				} else if (res.result.code != CODE.SUCC) {
 					if (hint) {
@@ -180,7 +187,7 @@ function callCloud(route, params = {}, options) {
 							showCancel: false
 						});
 				}
-				reject(err.result);
+				reject(err && err.result ? err.result : err);
 				return;
 			},
 			complete: function (res) {
@@ -304,15 +311,26 @@ async function transTempPics(imgList, dir, id, prefix = '') {
 		// 是否为临时文件
 		if (filePath.includes('tmp') || filePath.includes('temp') || filePath.includes('wxfile')) {
 			let rd = prefix + dataHelper.genRandomNum(100000, 999999);
-			await wx.cloud.uploadFile({
-				cloudPath: id ? dir + id + '/' + rd + ext : dir + rd + ext,
-				filePath: filePath, // 文件路径
-			}).then(res => {
+			try {
+				let res = await wx.cloud.uploadFile({
+					cloudPath: id ? dir + id + '/' + rd + ext : dir + rd + ext,
+					filePath: filePath, // 文件路径
+				});
+
+				if (!res || !res.fileID) {
+					let err = new Error('uploadFile result missing fileID');
+					err.result = res;
+					err.filePath = filePath;
+					throw err;
+				}
+
 				imgList[i] = res.fileID;
-			}).catch(error => {
+			} catch (error) {
 				// handle error TODO:剔除图片
 				console.error(error);
-			})
+				wx.hideLoading();
+				throw error;
+			}
 		}
 	}
 
@@ -353,9 +371,8 @@ async function transRichEditorTempPics(content, dir, id, route) {
 		return content;
 	} catch (e) {
 		console.error(e);
+		throw e;
 	}
-
-	return [];
 }
 
 // 封面图片上传到云空间
@@ -372,9 +389,15 @@ async function transCoverTempPics(imgList, dir, id, route) {
 	try {
 		// 更新数据 从promise 里直接同步返回
 		let res = await callCloudSumbit(route, params);
+		if (!res || !res.data || !res.data.urls) {
+			let err = new Error('cloud update pic result missing urls');
+			err.result = res;
+			throw err;
+		}
 		return res.data.urls;
 	} catch (err) {
 		console.error(err);
+		throw err;
 	}
 }
 
@@ -414,6 +437,7 @@ async function transFormsTempPics(forms, dir, id, route) {
 		await callCloudSumbit(route, params);
 	} catch (err) {
 		console.error(err);
+		throw err;
 	}
 }
 

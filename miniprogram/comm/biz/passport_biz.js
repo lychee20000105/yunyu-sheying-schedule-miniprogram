@@ -179,7 +179,7 @@ class PassportBiz extends BaseBiz {
 			};
 			await cloudHelper.callCloudSumbit('passport/phone', params, opt).then(res => {
 				let phone = res.data;
-				if (!phone || phone.length < 11)
+				if (!phone || !/^1[3-9]\d{9}$/.test(phone))
 					wx.showToast({
 						title: '手机号码获取失败，请重新填写手机号码',
 						icon: 'none',
@@ -204,7 +204,7 @@ class PassportBiz extends BaseBiz {
 /** 表单校验    */
 PassportBiz.CHECK_FORM = {
 	name: 'formName|must|string|min:1|max:30|name=昵称',
-	mobile: 'formMobile|must|len:11|name=手机',
+	mobile: 'formMobile|must|mobile|name=手机',
 	forms: 'formForms|array'
 };
 

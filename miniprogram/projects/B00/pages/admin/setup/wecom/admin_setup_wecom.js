@@ -6,7 +6,8 @@ const constants = require('../../../../../../comm/constants.js');
 Page({
 	data: {
 		isLoad: false,
-		formWebhookUrl: ''
+		formWebhookUrl: '',
+		savedWebhookUrl: ''
 	},
 
 	onLoad: async function () {
@@ -27,9 +28,10 @@ Page({
 			key: constants.SETUP_WECOM_WEBHOOK_URL
 		};
 
-		let webhookUrl = await cloudHelper.callCloudData('home/setup_get', params, opts);
+		let webhookUrl = await cloudHelper.callCloudData('admin/setup_get', params, opts);
 		this.setData({
 			formWebhookUrl: webhookUrl || '',
+			savedWebhookUrl: webhookUrl || '',
 			isLoad: true
 		});
 	},
@@ -52,6 +54,9 @@ Page({
 
 		try {
 			await cloudHelper.callCloudSumbit('admin/setup_set', params);
+			this.setData({
+				savedWebhookUrl: webhookUrl
+			});
 			pageHelper.showSuccToast('保存成功');
 		} catch (err) {
 			console.error(err);
@@ -62,8 +67,11 @@ Page({
 		if (!AdminBiz.isAdmin(this)) return;
 
 		let webhookUrl = (this.data.formWebhookUrl || '').trim();
-		if (!this._checkWebhook(webhookUrl)) {
-			return pageHelper.showModal('请先填写企业微信群机器人 Webhook 地址');
+		if (webhookUrl && !this._checkWebhook(webhookUrl)) {
+			return pageHelper.showModal('请填写企业微信群机器人 Webhook 地址');
+		}
+		if (webhookUrl && webhookUrl !== (this.data.savedWebhookUrl || '').trim()) {
+			return pageHelper.showModal('请先保存企业微信 Webhook 后再测试发送');
 		}
 
 		wx.showLoading({
@@ -73,9 +81,6 @@ Page({
 
 		wx.cloud.callFunction({
 			name: 'autoSendDaily',
-			data: {
-				webhookUrl
-			},
 			success: res => {
 				wx.hideLoading();
 				let result = res.result || {};

@@ -308,9 +308,10 @@ class AdminMeetService extends BaseProjectAdminService {
 			JOIN_MEET_ID: meetId,
 			JOIN_MEET_TIME_MARK: mark
 		};
-		if (util.isDefined(search) && search) {
+		let safeSearch = dbUtil.fmtRegexKeyword(search);
+		if (safeSearch) {
 			where['JOIN_FORMS.val'] = {
-				$regex: '.*' + search,
+				$regex: safeSearch,
 				$options: 'i'
 			};
 		} else if (sortType && util.isDefined(sortVal)) {
@@ -359,9 +360,10 @@ class AdminMeetService extends BaseProjectAdminService {
 		let fields = 'MEET_TYPE,MEET_TYPE_NAME,MEET_TITLE,MEET_STATUS,MEET_DAYS,MEET_ADD_TIME,MEET_EDIT_TIME,MEET_ORDER';
 
 		let where = {};
-		if (util.isDefined(search) && search) {
+		let safeSearch = dbUtil.fmtRegexKeyword(search);
+		if (safeSearch) {
 			where.MEET_TITLE = {
-				$regex: '.*' + search,
+				$regex: safeSearch,
 				$options: 'i'
 			};
 		} else if (sortType && util.isDefined(sortVal)) {

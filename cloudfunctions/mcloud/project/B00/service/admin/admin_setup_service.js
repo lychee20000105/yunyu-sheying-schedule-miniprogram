@@ -11,6 +11,10 @@ const config = require('../../../../config/config.js');
 
 class AdminSetupService extends BaseProjectAdminService {
 
+	async getSetup(key) {
+		return await setupUtil.get(key);
+	}
+
 	// 通用setup
 	async setSetup(key, val) {
 		await setupUtil.set(key, val);

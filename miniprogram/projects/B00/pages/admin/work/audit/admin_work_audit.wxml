@@ -1,0 +1,38 @@
+<view class="page" wx:if="{{data}}">
+	<view class="section">订单完成审核</view>
+	<view wx:if="{{data.orders.length==0}}" class="empty">暂无待审核订单</view>
+	<view wx:for="{{data.orders}}" wx:key="_id" wx:for-index="oi" class="card">
+		<view class="title">{{item.ORDER_TYPE_NAME}}｜{{item.ORDER_CUSTOMER_NAME}}</view>
+		<view class="meta">{{item.ORDER_DATE}} {{item.ORDER_TIME}} ｜ 实收 {{item.ORDER_ACTUAL_AMOUNT}}</view>
+		<view wx:for="{{item.ORDER_PARTICIPANTS}}" wx:for-item="p" wx:for-index="pi" wx:key="id" class="part">
+			<text>{{p.staffName}} · {{p.roleName}}</text>
+			<input type="digit" value="{{p.amount}}" data-oi="{{oi}}" data-pi="{{pi}}" bindinput="bindPartAmountInput" />
+		</view>
+		<view class="actions">
+			<button class="reject" bindtap="bindOrderRejectTap" data-idx="{{oi}}">驳回</button>
+			<button class="pass" bindtap="bindOrderPassTap" data-idx="{{oi}}">通过</button>
+		</view>
+	</view>
+
+	<view class="section">事项审核</view>
+	<view wx:if="{{data.items.length==0}}" class="empty">暂无待审核事项</view>
+	<view wx:for="{{data.items}}" wx:key="_id" class="card">
+		<view class="title">{{item.ITEM_TITLE}}</view>
+		<view class="meta">{{item.ITEM_DATE}} {{item.ITEM_TIME}} ｜ {{item.ITEM_CREATOR_NAME}}</view>
+		<view class="actions">
+			<button class="reject" bindtap="bindItemAuditTap" data-id="{{item._id}}" data-pass="{{false}}">驳回</button>
+			<button class="pass" bindtap="bindItemAuditTap" data-id="{{item._id}}" data-pass="{{true}}">通过</button>
+		</view>
+	</view>
+
+	<view class="section">休息审核</view>
+	<view wx:if="{{data.rests.length==0}}" class="empty">暂无待审核休息</view>
+	<view wx:for="{{data.rests}}" wx:key="_id" class="card">
+		<view class="title">{{item.REST_STAFF_NAME}}｜{{item.REST_TYPE}}</view>
+		<view class="meta">{{item.REST_DATE}} {{item.REST_REASON}}</view>
+		<view class="actions">
+			<button class="reject" bindtap="bindRestAuditTap" data-id="{{item._id}}" data-pass="{{false}}">驳回</button>
+			<button class="pass" bindtap="bindRestAuditTap" data-id="{{item._id}}" data-pass="{{true}}">通过</button>
+		</view>
+	</view>
+</view>

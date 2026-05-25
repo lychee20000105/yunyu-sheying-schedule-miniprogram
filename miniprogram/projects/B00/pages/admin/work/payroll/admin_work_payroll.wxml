@@ -1,0 +1,36 @@
+<view class="page">
+	<view class="filters">
+		<picker range="{{staffList}}" range-key="STAFF_NAME" bindchange="bindStaffChange">
+			<view>{{currentStaffName}}</view>
+		</picker>
+		<picker mode="date" fields="month" value="{{month}}" bindchange="bindMonthChange">
+			<view>{{month}}</view>
+		</picker>
+	</view>
+
+	<view wx:if="{{data}}" class="summary">
+		<view><text>待发</text><view>{{data.payableTotal}}</view></view>
+		<view><text>调整</text><view>{{data.adjustmentTotal}}</view></view>
+		<view><text>合计</text><view>{{data.total}}</view></view>
+	</view>
+
+	<view class="block" wx:if="{{data}}">
+		<view class="row"><text>实发金额</text><input type="digit" value="{{actualAmount}}" data-field="actualAmount" bindinput="bindInput" /></view>
+		<view class="row"><text>备注</text><input value="{{note}}" data-field="note" bindinput="bindInput" /></view>
+		<button class="pay" bindtap="bindPayTap">已发工资</button>
+	</view>
+
+	<view class="section">待发明细</view>
+	<view wx:for="{{data.payable}}" wx:key="orderId" class="card">
+		<view class="title">{{item.customerName}}｜{{item.typeName}}</view>
+		<view class="meta">{{item.date}} · {{item.roleName}}</view>
+		<view class="amount">{{item.amount}}</view>
+	</view>
+
+	<view class="section">调整金额</view>
+	<view wx:for="{{data.adjustments}}" wx:key="id" class="card">
+		<view class="title">{{item.customerName}}｜{{item.typeName}}</view>
+		<view class="meta">{{item.reason}}</view>
+		<view class="amount">{{item.amount}}</view>
+	</view>
+</view>

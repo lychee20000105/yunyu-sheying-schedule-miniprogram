@@ -5,6 +5,7 @@ const CLOUD_ID = process.env.CLOUD_ID || 'yunyukeji-d4g7waei5d5d6cdeb';
 const PROJECT_ID = process.env.PROJECT_ID || 'B00';
 const WECOM_WEBHOOK_URL = process.env.WECOM_WEBHOOK_URL || '';
 const SETUP_WECOM_WEBHOOK_URL = 'SETUP_WECOM_WEBHOOK_URL';
+const WECOM_WEBHOOK_PREFIX = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=';
 
 cloud.init({
 	env: CLOUD_ID
@@ -14,13 +15,20 @@ const db = cloud.database();
 
 exports.main = async event => {
 	const day = event && event.day ? event.day : getChinaDay();
-	const webhookUrl = event && event.webhookUrl ? event.webhookUrl : await getWebhookUrl();
+	const webhookUrl = await getWebhookUrl();
 
 	if (!webhookUrl) {
 		console.error('WECOM_WEBHOOK_URL is empty');
 		return {
 			code: -1,
 			message: '未配置企业微信群机器人 Webhook，请在后台“企业微信机器人”中填写'
+		};
+	}
+	if (!isValidWecomWebhookUrl(webhookUrl)) {
+		console.error('WECOM_WEBHOOK_URL is invalid');
+		return {
+			code: -1,
+			message: '企业微信群机器人 Webhook 配置无效，请填写企业微信机器人生成的 Webhook 地址'
 		};
 	}
 
@@ -47,7 +55,7 @@ exports.main = async event => {
 
 async function getWebhookUrl() {
 	const savedUrl = await getSavedWebhookUrl();
-	return savedUrl || WECOM_WEBHOOK_URL;
+	return savedUrl || WECOM_WEBHOOK_URL.trim();
 }
 
 async function getSavedWebhookUrl() {
@@ -82,6 +90,22 @@ function pickSetupValue(res) {
 	if (!row || !row.SETUP_VALUE) return '';
 	const val = row.SETUP_VALUE.val;
 	return typeof val === 'string' ? val.trim() : '';
+}
+
+function isValidWecomWebhookUrl(url) {
+	if (typeof url !== 'string') return false;
+	const value = url.trim();
+	if (!value.startsWith(WECOM_WEBHOOK_PREFIX)) return false;
+
+	try {
+		const parsed = new URL(value);
+		return parsed.protocol === 'https:'
+			&& parsed.hostname === 'qyapi.weixin.qq.com'
+			&& parsed.pathname === '/cgi-bin/webhook/send'
+			&& !!parsed.searchParams.get('key');
+	} catch (err) {
+		return false;
+	}
 }
 
 async function getDailyJoins(day) {

@@ -55,8 +55,16 @@
 	height: 70rpx;
 	text-align: right;
 	background-color: #f8f8f8;
-	border-radius: 5rpx;
+	border-radius: 8rpx;
 	color: #333;
+}
+
+.form-group input[disabled],
+.form-group textarea[disabled],
+.form-group .disabled {
+	color: #a1aab8 !important;
+	background-color: #f6f7f9;
+	border-radius: 8rpx;
 }
 
 .modal-form .form-group .title {

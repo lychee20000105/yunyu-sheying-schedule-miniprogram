@@ -242,7 +242,7 @@ function checkForm(fields, forms, that) {
 				break;
 			}
 			case 'mobile': {
-				if (val.length > 0 && val.length != 11) {
+				if (val.length > 0 && !/^1[3-9]\d{9}$/.test(val)) {
 					fields[k].focus = '请填写正确的 ' + title;
 					pageHelper.anchor('form' + forms[k].mark, that);
 					return pageHelper.showModal('请填写正确的 ' + title);

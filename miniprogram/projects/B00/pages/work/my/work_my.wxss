@@ -1,0 +1,148 @@
+page {
+	background: #f6f7f9;
+}
+
+.page {
+	padding: 24rpx;
+}
+
+.block {
+	background: #fff;
+	border-radius: 10rpx;
+	padding: 24rpx;
+	margin-bottom: 18rpx;
+	box-sizing: border-box;
+}
+
+.title {
+	margin-bottom: 12rpx;
+	color: #202735;
+	font-size: 32rpx;
+	font-weight: 800;
+	line-height: 1.35;
+}
+
+.row {
+	min-height: 82rpx;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	border-bottom: 1rpx solid #edf0f4;
+	color: #303846;
+	font-size: 28rpx;
+}
+
+.row input {
+	flex: 1;
+	margin-left: 24rpx;
+	text-align: right;
+	color: #202735;
+	font-size: 27rpx;
+}
+
+.primary {
+	margin-top: 26rpx;
+	height: 80rpx;
+	line-height: 80rpx;
+	border-radius: 10rpx;
+	background: #ff2d62;
+	color: #fff;
+	font-size: 29rpx;
+	font-weight: 800;
+}
+
+.profile {
+	display: flex;
+	align-items: center;
+	text-align: left;
+}
+
+.avatar {
+	flex: none;
+	width: 92rpx;
+	height: 92rpx;
+	line-height: 92rpx;
+	border-radius: 46rpx;
+	background: #111827;
+	color: #fff;
+	font-size: 40rpx;
+	font-weight: 900;
+	text-align: center;
+}
+
+.profile-main {
+	flex: 1;
+	min-width: 0;
+	margin-left: 22rpx;
+}
+
+.name {
+	color: #202735;
+	font-size: 34rpx;
+	font-weight: 900;
+	line-height: 1.25;
+}
+
+.mobile {
+	color: #858d99;
+	font-size: 25rpx;
+	line-height: 1.4;
+	margin-top: 6rpx;
+}
+
+.roles {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10rpx;
+	margin-top: 14rpx;
+}
+
+.roles text {
+	background: #f1f4f8;
+	border-radius: 6rpx;
+	padding: 6rpx 12rpx;
+	color: #596273;
+	font-size: 23rpx;
+	line-height: 1.25;
+}
+
+.menu {
+	padding: 0 24rpx;
+}
+
+.item {
+	min-height: 86rpx;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	border-bottom: 1rpx solid #edf0f4;
+	color: #202735;
+	font-size: 28rpx;
+	font-weight: 700;
+}
+
+.item:last-child {
+	border-bottom: 0;
+}
+
+.item-left {
+	display: flex;
+	align-items: center;
+	min-width: 0;
+}
+
+.item-left [class*=icon] {
+	width: 42rpx;
+	margin-right: 16rpx;
+	color: #6f7a8a;
+	font-size: 32rpx;
+	text-align: center;
+}
+
+.arrow {
+	margin-left: 18rpx;
+	color: #b5bbc5;
+	font-size: 34rpx;
+	font-weight: 400;
+	line-height: 1;
+}

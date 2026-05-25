@@ -18,34 +18,48 @@
 	</view>
 
 
-	<view class="comm-list grid col-{{stat.length}}"> 
-		<view wx:for="{{stat}}" wx:key="key" class="item">{{item.cnt||'0'}}<text class="text-black">{{item.title}}</text></view> 
-
+	<view class="section-title">数据概览</view>
+	<view class="comm-list grid stat-list col-{{stat.length}}">
+		<view wx:for="{{stat}}" wx:key="key" class="item stat-item">
+			<text class="stat-num">{{item.cnt||'0'}}</text>
+			<text class="stat-title">{{item.title}}</text>
+		</view>
 	</view>
 
-	<view class="bar bg-white solid-bottom margin-top-s ">
+	<view class="bar bg-white solid-bottom section-bar">
 		<view class="action">
-			<text class="icon-title"></text>功能管理
+			<text class="icon-title"></text>常用入口
 		</view>
 	</view>
 
-	<view class="comm-list grid col-3">
-		<view class="item" bindtap="url" data-url="../../user/list/admin_user_list"> <text class="icon-group_fill text-green"></text> <text class="text-black">用户管理</text>
+	<view class="comm-list grid quick-list col-3">
+		<view class="item quick-item" bindtap="url" data-url="../../work/staff/admin_work_staff"> <text class="icon-group text-red"></text> <text class="quick-label text-black">员工提成</text>
 		</view>
-		<view class="item" bindtap="url" data-url="../../meet/list/admin_meet_list"> <text class="icon-activityfill text-blue"></text> <text class="text-black">预约管理</text>
+		<view class="item quick-item" bindtap="url" data-url="../../work/audit/admin_work_audit"> <text class="icon-roundcheckfill text-orange"></text> <text class="quick-label text-black">档期审核</text>
+		</view>
+		<view class="item quick-item" bindtap="url" data-url="../../work/payroll/admin_work_payroll"> <text class="icon-moneybag text-purple"></text> <text class="quick-label text-black">工资结算</text>
+		</view>
+		<view class="item quick-item" bindtap="url" data-url="../../work/type/admin_work_type"> <text class="icon-tagfill text-cyan"></text> <text class="quick-label text-black">订单类型</text>
+		</view>
+		<view class="item quick-item" bindtap="url" data-url="../../work/canceled/admin_work_canceled"> <text class="icon-deletefill text-grey"></text> <text class="quick-label text-black">取消订单</text>
+		</view>
+		<view class="item quick-item" bindtap="url" data-url="../../user/list/admin_user_list"> <text class="icon-group_fill text-green"></text> <text class="quick-label text-black">用户管理</text>
+		</view>
+		<view class="item quick-item" bindtap="url" data-url="../../meet/list/admin_meet_list"> <text class="icon-activityfill text-blue"></text> <text class="quick-label text-black">预约管理</text>
 		</view>  
-		<view class="item" bindtap="url" data-url="../../news/list/admin_news_list"> <text class="icon-newsfill text-darkgreen"></text> <text class="text-black">内容管理</text>
+		<view class="item quick-item" bindtap="url" data-url="../../news/list/admin_news_list"> <text class="icon-newsfill text-darkgreen"></text> <text class="quick-label text-black">内容管理</text>
 		</view>
 	 
-		<view class="item" bindtap="url" data-url="../../album/list/admin_album_list"> <text class="icon-picfill text-red"></text> <text class="text-black">样片管理</text>
+		<view class="item quick-item" bindtap="url" data-url="../../album/list/admin_album_list"> <text class="icon-picfill text-red"></text> <text class="quick-label text-black">样片管理</text>
 		</view>
-		<view class="item" bindtap="url" data-url="../../product/list/admin_product_list"> <text class="icon-album text-cyan"></text> <text class="text-black">拍摄服务</text>
+		<view class="item quick-item" bindtap="url" data-url="../../product/list/admin_product_list"> <text class="icon-album text-cyan"></text> <text class="quick-label text-black">拍摄服务</text>
 		</view>
 	</view>
 
 
 	<!-- BOTTOM begin -->
-	<view class="comm-list menu  margin-top">
+	<view class="section-title">系统设置</view>
+	<view class="comm-list menu setting-list">
 	 
 		<view class="item arrow" bindtap="url" data-url='../../setup/about/admin_setup_about'>
 			<view class="content">
@@ -68,8 +82,7 @@
 				<text class="text-black">企业微信机器人</text>
 			</view>
 		</view>
-	</view>
-	<view class="comm-list menu margin-bottom-xl"> 
+
 		<view wx:if="{{isSuperAdmin}}" class="item arrow" bindtap="url" data-url='../../mgr/list/admin_mgr_list'>
 			<view class="content">
 				<text class="icon-profile text-red"></text>

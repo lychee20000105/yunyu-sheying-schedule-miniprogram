@@ -46,12 +46,24 @@
 <!-- content begin -->
 <view wx:if="{{!isTotalMenu}}" class="box-list" style="height:{{listHeight?listHeight:'(100vh)'}};margin-top:0rpx;">
 	<scroll-view    refresher-enabled="true" refresher-triggered="{{refresherTriggered}}" scroll-y="true" class="box-list-scroll" bindrefresherrefresh='bindPullDownRefresh' bindscrolltolower='bindReachBottom' scroll-top='{{topNum}}' bindscroll="bindScrollTop">
+		<view wx:if="{{refresherTriggered}}" class="comm-list-state refresh">
+			<text class="icon-refresh margin-right-xxs"></text>刷新中...
+		</view>
+		<view wx:elif="{{isLoading}}" class="comm-list-state loading">
+			<text class="icon-loading margin-right-xxs"></text>加载中...
+		</view>
 		<slot  />  
 	</scroll-view>
 </view>
 
 <view wx:if="{{isTotalMenu}}" class="box-list" style="height:calc(100vh - {{(!sortItems.length && !sortMenus.length)? '110' : '190'}}rpx);margin-top:{{(!sortItems.length && !sortMenus.length)? '110' : '190'}}rpx">
 	<scroll-view  refresher-enabled="true" refresher-triggered="{{refresherTriggered}}" scroll-y="true" class="box-list-scroll" bindrefresherrefresh='bindPullDownRefresh' bindscrolltolower='bindReachBottom' scroll-top='{{topNum}}' bindscroll="bindScrollTop">
+		<view wx:if="{{refresherTriggered}}" class="comm-list-state refresh">
+			<text class="icon-refresh margin-right-xxs"></text>刷新中...
+		</view>
+		<view wx:elif="{{isLoading}}" class="comm-list-state loading">
+			<text class="icon-loading margin-right-xxs"></text>加载中...
+		</view>
 		<slot  />    
 	</scroll-view>
 </view>

@@ -1,0 +1,9 @@
+page { background: #f6f7f9; }
+.page { padding: 24rpx; }
+.empty { color: #8b9099; padding: 80rpx; text-align: center; }
+.card { background: #fff; border-radius: 12rpx; padding: 26rpx; margin-bottom: 20rpx; }
+.title { font-size: 32rpx; font-weight: 900; }
+.meta { color: #8b9099; margin: 14rpx 0 22rpx; }
+.actions { display: flex; gap: 14rpx; }
+button { flex: 1; height: 72rpx; line-height: 72rpx; border-radius: 36rpx; background: #9ca3af; color: #fff; font-weight: 800; }
+.restore { background: #ff2d62; }

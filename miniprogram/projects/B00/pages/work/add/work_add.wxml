@@ -1,0 +1,24 @@
+<view class="page">
+	<view class="grid">
+		<view class="card" bindtap="url" data-url="../order_edit/work_order_edit?day={{day}}">
+			<view class="icon blue">订</view>
+			<view class="title">订单档期</view>
+			<view class="desc">订单、客户、提成</view>
+		</view>
+		<view class="card" bindtap="url" data-url="../item_edit/work_item_edit?day={{day}}">
+			<view class="icon yellow">事</view>
+			<view class="title">事项档期</view>
+			<view class="desc">非订单占用</view>
+		</view>
+		<view class="card" bindtap="url" data-url="../note_edit/work_note_edit">
+			<view class="icon green">记</view>
+			<view class="title">小记</view>
+			<view class="desc">个人或团队记录</view>
+		</view>
+		<view class="card" bindtap="url" data-url="../rest_edit/work_rest_edit?day={{day}}">
+			<view class="icon grey">休</view>
+			<view class="title">休息日期</view>
+			<view class="desc">请假、调休</view>
+		</view>
+	</view>
+</view>

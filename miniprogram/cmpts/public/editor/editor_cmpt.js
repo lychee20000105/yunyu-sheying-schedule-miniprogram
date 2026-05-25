@@ -86,10 +86,14 @@ Component({
 				mediaType: ['image'],
 				sizeType: ['compressed'],
 				sourceType: ['album', 'camera'],
-				success(res) {
+				async success(res) {
 					console.log(res)
-					let nodeList = that.data.nodeList;
-					for (let k in res.tempFiles) {
+					let addNodes = [];
+					wx.showLoading({
+						title: '图片校验中',
+						mask: true
+					});
+					for (let k = 0; k < res.tempFiles.length; k++) {
 						let path = res.tempFiles[k].tempFilePath;
 						let size = res.tempFiles[k].size;
 						console.log(path)
@@ -106,16 +110,26 @@ Component({
 						if (!contentCheckHelper.imgSizeCheck(size, imageMaxSize)) {
 							wx.hideLoading();
 							return pageHelper.showModal('图片大小不能超过 ' + maxSize + '兆');
-						} 
+						}
+
+						let check = await contentCheckHelper.imgCheck(path);
+						if (!check) {
+							wx.hideLoading();
+							return pageHelper.showNoneToast('存在不合适的图片, 已屏蔽', 3000);
+						}
 
 						let node = {
 							type: 'img',
 							val: path
 						};
-					
-						nodeList.splice(idx + 1, 0, node);
+						addNodes.push(node);
 					}
 
+					let nodeList = that.data.nodeList;
+					for (let k = 0; k < addNodes.length; k++) {
+						nodeList.splice(idx + 1, 0, addNodes[k]);
+					}
+					wx.hideLoading();
 					that.setData({
 						nodeList
 					});

@@ -1,6 +1,52 @@
 @import "../../../../../style/public/detail.wxss";
 @import "../../../style/skin.wxss"; 
 
+.meet-state-page {
+	min-height: 70vh;
+	padding: 180rpx 56rpx 80rpx;
+	box-sizing: border-box;
+	text-align: center;
+	color: var(--projectTextColor);
+}
+
+.meet-state-icon {
+	width: 96rpx;
+	height: 96rpx;
+	margin: 0 auto 28rpx;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: #fff;
+	box-shadow: 6rpx 6rpx 8rpx rgba(114, 130, 138, 0.1);
+}
+
+.meet-state-icon text {
+	font-size: 48rpx;
+}
+
+.meet-state-page.loading .meet-state-icon text {
+	color: var(--projectColor);
+	animation: icon-spin 2s infinite linear;
+}
+
+.meet-state-page.error .meet-state-icon text {
+	color: #ff6b6b;
+}
+
+.meet-state-title {
+	font-size: 34rpx;
+	font-weight: bold;
+	line-height: 1.5;
+}
+
+.meet-state-desc {
+	margin-top: 12rpx;
+	color: #8799a3;
+	font-size: 26rpx;
+	line-height: 1.7;
+}
+
 .form-group .line-desc {
 	font-size: 28rpx;
 	text-align: center;
@@ -10,4 +56,22 @@
 
 .submit-line {
 	width: 100%;
+}
+
+.meet-submit-btn {
+	position: relative;
+	transition: opacity .2s ease;
+}
+
+.meet-submit-btn.submitting {
+	opacity: .72;
+}
+
+.submit-status {
+	margin-top: -72rpx;
+	margin-bottom: 72rpx;
+	text-align: center;
+	color: #8799a3;
+	font-size: 24rpx;
+	line-height: 1.6;
 }

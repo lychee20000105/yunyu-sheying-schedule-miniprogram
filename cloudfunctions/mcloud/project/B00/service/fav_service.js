@@ -6,6 +6,7 @@
 
 const BaseProjectService = require('./base_project_service.js');
 const util = require('../../../framework/utils/util.js');
+const dbUtil = require('../../../framework/database/db_util.js');
 const FavModel = require('../model/fav_model.js'); 
 
 class FavService extends BaseProjectService {
@@ -92,9 +93,10 @@ class FavService extends BaseProjectService {
 		let fields = 'FAV_TITLE,FAV_ADD_TIME,FAV_OID,FAV_TYPE,FAV_PATH';
 
 		let where = {};
-		if (util.isDefined(search) && search) {
+		let safeSearch = dbUtil.fmtRegexKeyword(search);
+		if (safeSearch) {
 			where.FAV_TITLE = {
-				$regex: '.*' + search,
+				$regex: safeSearch,
 				$options: 'i'
 			};
 		}

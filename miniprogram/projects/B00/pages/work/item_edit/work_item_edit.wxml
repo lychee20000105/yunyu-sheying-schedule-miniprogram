@@ -1,0 +1,23 @@
+<view class="page">
+	<view class="block">
+		<view class="row">
+			<text class="label">事项</text>
+			<input value="{{item.ITEM_TITLE}}" placeholder="事项名称" data-field="ITEM_TITLE" bindinput="bindInput" />
+		</view>
+		<view class="row">
+			<text class="label">日期</text>
+			<picker mode="date" value="{{item.ITEM_DATE}}" bindchange="bindDateChange">
+				<view>{{item.ITEM_DATE}}</view>
+			</picker>
+		</view>
+		<view class="row">
+			<text class="label">时间</text>
+			<input value="{{item.ITEM_TIME}}" placeholder="如 09:00" data-field="ITEM_TIME" bindinput="bindInput" />
+		</view>
+		<view class="area">
+			<text class="label">内容</text>
+			<textarea value="{{item.ITEM_CONTENT}}" placeholder="事项内容" data-field="ITEM_CONTENT" bindinput="bindInput"></textarea>
+		</view>
+	</view>
+	<button class="submit" bindtap="bindSubmitTap">确认保存</button>
+</view>

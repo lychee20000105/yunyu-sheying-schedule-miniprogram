@@ -1,0 +1,64 @@
+<view wx:if="{{!isLoad}}" class="margin-top load loading text-l text-project"></view>
+
+<view class="work-page" wx:if="{{isLoad}}">
+	<view class="topbar">
+		<view class="avatar">{{options.staffInitial}}</view>
+		<view class="seg">
+			<view class="seg-item {{scope=='all'?'active':''}}" bindtap="bindScopeTap" data-scope="all">全店</view>
+			<view class="seg-item {{scope=='mine'?'active':''}}" bindtap="bindScopeTap" data-scope="mine">我的</view>
+		</view>
+	</view>
+
+	<view class="monthbar">
+		<view class="month-btn" bindtap="bindPrevMonthTap">‹</view>
+		<view class="month-title" bindtap="bindTodayTap">{{month}}</view>
+		<view class="month-btn" bindtap="bindNextMonthTap">›</view>
+	</view>
+
+	<view class="week">
+		<view>日</view><view>一</view><view>二</view><view>三</view><view>四</view><view>五</view><view>六</view>
+	</view>
+
+	<view class="calendar">
+		<view wx:for="{{days}}" wx:key="date" class="day {{item.isCurMonth?'':'muted'}} {{item.isToday?'today':''}} {{item.isSelect?'selected':''}}" bindtap="bindDayTap" data-day="{{item.date}}">
+			<view class="num">{{item.day}}</view>
+			<view class="lunar">{{item.lunar}}</view>
+			<view class="tags">
+				<view wx:for="{{item.tags}}" wx:for-item="tag" wx:key="id" class="tag" style="background:{{tag.color}}">{{tag.typeName}}</view>
+			</view>
+		</view>
+	</view>
+
+	<view class="section-title-row">
+		<view class="section-title">{{day}} 档期</view>
+		<view class="inline-add" bindtap="bindAddTap">新增</view>
+	</view>
+
+	<view class="day-list">
+		<view wx:if="{{dayData && dayData.orders.length==0 && dayData.items.length==0 && dayData.rests.length==0}}" class="empty">当天暂无档期</view>
+
+		<view wx:for="{{dayData.orders}}" wx:key="_id" class="order-card" bindtap="bindOrderTap" data-id="{{item._id}}" data-full="{{item.canFull}}">
+			<view class="order-head">
+				<view class="order-type" style="background:{{item.ORDER_TYPE_COLOR}}">{{item.ORDER_TYPE_NAME}}</view>
+				<view class="order-time">{{item.ORDER_TIME || '全天'}}</view>
+			</view>
+			<view class="customer">{{item.canFull ? item.ORDER_CUSTOMER_NAME : item.ORDER_CUSTOMER_SURNAME + '姓客户'}}</view>
+			<view wx:if="{{item.canFull}}" class="money">
+				订单 {{item.ORDER_AMOUNT || 0}} ｜ 实收 {{item.ORDER_ACTUAL_AMOUNT || 0}} ｜ 未收 {{(item.ORDER_AMOUNT || 0) - ((item.ORDER_DEPOSIT || 0) + (item.ORDER_FINAL || 0))}}
+			</view>
+			<view class="meta">{{item.ORDER_PROGRESS_DESC}} · {{item.ORDER_SETTLE_STATUS_DESC}}</view>
+		</view>
+
+		<view wx:for="{{dayData.items}}" wx:key="_id" class="simple-card">
+			<view class="simple-title">事项｜{{item.ITEM_TITLE}}</view>
+			<view class="simple-desc">{{item.ITEM_TIME}} {{item.ITEM_CONTENT}}</view>
+		</view>
+
+		<view wx:for="{{dayData.rests}}" wx:key="_id" class="simple-card rest">
+			<view class="simple-title">休息｜{{item.REST_STAFF_NAME}}</view>
+			<view class="simple-desc">{{item.REST_TYPE}} {{item.REST_REASON}}</view>
+		</view>
+	</view>
+
+	<button class="fab" hover-class="fab-hover" bindtap="bindAddTap">+</button>
+</view>

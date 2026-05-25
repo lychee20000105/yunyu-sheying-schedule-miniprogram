@@ -4,45 +4,172 @@
  * Date: 2025-09-05 04:00:00 
  */
 
+const crypto = require('crypto');
 const timeUtil = require('./time_util.js');
+
+const RANDOM_STRING_CHARS = 'abcdefghijklmnopqrstuvwxyz' + Array.from({ length: 10 }, (_, idx) => String(idx)).join('');
+const RANDOM_INT_CHARS = Array.from({ length: 10 }, (_, idx) => String(idx)).join('');
+const RANDOM_ALPHA_CHARS = 'abcdefghijklmnopqrstuvwxyz';
+
+const PASSWORD_HASH_PREFIX = 'pbkdf2_sha256';
+const PASSWORD_HASH_ITERATIONS = 120000;
+const PASSWORD_HASH_KEY_LEN = 32;
+const PASSWORD_SALT_LEN = 16;
 
 /**
  * 生成一个特定范围内的随机数
  */
-const genRandomNum = (min, max) => (Math.random() * (max - min + 1) | 0) + min;
+const randomIndex = max => {
+	if (!Number.isInteger(max) || max <= 0) return 0;
+
+	const maxUInt32 = 0x100000000;
+	const limit = maxUInt32 - (maxUInt32 % max);
+	let value = 0;
+
+	do {
+		value = crypto.randomBytes(4).readUInt32BE(0);
+	} while (value >= limit);
+
+	return value % max;
+}
+
+const genRandomNum = (min, max) => {
+	min = Math.ceil(Number(min));
+	max = Math.floor(Number(max));
+
+	if (!Number.isFinite(min) || !Number.isFinite(max)) return 0;
+	if (min > max) [min, max] = [max, min];
+
+	return min + randomIndex(max - min + 1);
+}
+
+const genRandomByChars = (len, chars) => {
+	len = Number(len) || 0;
+	if (len <= 0) return '';
+
+	let rdmString = '';
+	for (; rdmString.length < len; rdmString += chars.charAt(randomIndex(chars.length)));
+	return rdmString;
+}
 
 // 生成一个随机的数字字母字符串
-const genRandomString = len => {
-	const text = 'abcdefghijklmnopqrstuvwxyz0123456789';
-	const rdmIndex = text => Math.random() * text.length | 0;
-	let rdmString = '';
-	for (; rdmString.length < len; rdmString += text.charAt(rdmIndex(text)));
-	return rdmString;
-}
+const genRandomString = len => genRandomByChars(len, RANDOM_STRING_CHARS);
 
 // 生成一个随机的数字字符串
-const genRandomIntString = len => {
-	const text = '0123456789';
-	const rdmIndex = text => Math.random() * text.length | 0;
-	let rdmString = '';
-	for (; rdmString.length < len; rdmString += text.charAt(rdmIndex(text)));
-	return rdmString;
-}
+const genRandomIntString = len => genRandomByChars(len, RANDOM_INT_CHARS);
 
 // 生成一个随机的字母字符串
-const genRandomAlpha = len => {
-	const text = 'abcdefghijklmnopqrstuvwxyz';
-	const rdmIndex = text => Math.random() * text.length | 0;
-	let rdmString = '';
-	for (; rdmString.length < len; rdmString += text.charAt(rdmIndex(text)));
-	return rdmString;
+const genRandomAlpha = len => genRandomByChars(len, RANDOM_ALPHA_CHARS);
+
+function genStrongPassword(len = 24) {
+	const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+	const lower = RANDOM_ALPHA_CHARS;
+	const digit = RANDOM_INT_CHARS;
+	const symbol = '!@#$%^&*_-+=';
+	const groups = [upper, lower, digit, symbol];
+	const chars = groups.join('');
+	let pwd = groups.map(group => group.charAt(randomIndex(group.length)));
+
+	for (; pwd.length < len; pwd.push(chars.charAt(randomIndex(chars.length)))) { }
+
+	for (let i = pwd.length - 1; i > 0; i--) {
+		let j = randomIndex(i + 1);
+		[pwd[i], pwd[j]] = [pwd[j], pwd[i]];
+	}
+
+	return pwd.join('');
+}
+
+function parsePasswordHash(passwordHash) {
+	if (!passwordHash) return null;
+
+	let parts = String(passwordHash).split('$');
+	if (parts.length != 4 || parts[0] != PASSWORD_HASH_PREFIX) return null;
+
+	let iterations = Number(parts[1]);
+	let salt = parts[2];
+	let hash = parts[3];
+	if (!Number.isInteger(iterations) || iterations < 10000) return null;
+	if (!/^[0-9a-f]+$/i.test(salt) || !/^[0-9a-f]+$/i.test(hash)) return null;
+
+	return {
+		iterations,
+		salt,
+		hash
+	};
+}
+
+function safeEqualHex(a, b) {
+	a = String(a || '').toLowerCase();
+	b = String(b || '').toLowerCase();
+	if (!/^[0-9a-f]+$/i.test(a) || !/^[0-9a-f]+$/i.test(b)) return false;
+	if (a.length != b.length) return false;
+
+	return crypto.timingSafeEqual(Buffer.from(a, 'hex'), Buffer.from(b, 'hex'));
+}
+
+function hashPassword(password) {
+	let salt = crypto.randomBytes(PASSWORD_SALT_LEN).toString('hex');
+	let hash = crypto.pbkdf2Sync(String(password), Buffer.from(salt, 'hex'), PASSWORD_HASH_ITERATIONS, PASSWORD_HASH_KEY_LEN, 'sha256').toString('hex');
+	return `${PASSWORD_HASH_PREFIX}$${PASSWORD_HASH_ITERATIONS}$${salt}$${hash}`;
+}
+
+function isLegacyMd5PasswordHash(passwordHash) {
+	return /^[0-9a-f]{32}$/i.test(String(passwordHash || ''));
+}
+
+function hashLegacyMd5Password(password) {
+	return crypto.createHash('md5').update(String(password)).digest('hex');
+}
+
+function verifyPassword(password, passwordHash) {
+	let parsedHash = parsePasswordHash(passwordHash);
+	if (parsedHash) {
+		let hash = crypto.pbkdf2Sync(String(password), Buffer.from(parsedHash.salt, 'hex'), parsedHash.iterations, PASSWORD_HASH_KEY_LEN, 'sha256').toString('hex');
+		return safeEqualHex(hash, parsedHash.hash);
+	}
+
+	if (isLegacyMd5PasswordHash(passwordHash)) {
+		return safeEqualHex(hashLegacyMd5Password(password), passwordHash);
+	}
+
+	return false;
+}
+
+function needsPasswordHashUpgrade(passwordHash) {
+	return !parsePasswordHash(passwordHash);
+}
+
+function getPasswordStrengthError(password) {
+	password = String(password || '');
+
+	if (password.length < 12 || password.length > 30) return 'Password must be 12-30 characters.';
+
+	let categoryCount = [
+		/[a-z]/.test(password),
+		/[A-Z]/.test(password),
+		/\d/.test(password),
+		/[^A-Za-z0-9]/.test(password)
+	].filter(Boolean).length;
+	if (categoryCount < 3) return 'Password must include at least 3 character classes.';
+
+	let normalized = password.toLowerCase();
+	if (normalized.includes('admin') || normalized.includes('password')) return 'Password cannot include common admin words.';
+	if (/(.)\1{5,}/.test(password)) return 'Password cannot use long repeated characters.';
+
+	return '';
+}
+
+function assertStrongPassword(password) {
+	let err = getPasswordStrengthError(password);
+	if (err) throw new Error(err);
 }
 
 // 根据数据库自定义表单提取导出表格标题
 function getTitleByForm(arr) {
 	let formTitle = [];
 	for (let k in arr) {
-		if (arr.type == 'image' || arr.type == 'content') continue;
+		if (arr[k].type == 'image' || arr[k].type == 'content') continue;
 
 		formTitle.push({
 			column: arr[k].title,
@@ -493,6 +620,12 @@ module.exports = {
 	genRandomIntString,
 	genRandomAlpha,
 	genRandomNum, // 随机数字 
+	genStrongPassword,
+	hashPassword,
+	verifyPassword,
+	needsPasswordHashUpgrade,
+	getPasswordStrengthError,
+	assertStrongPassword,
 	fmtText, // 文本内容格式化处理
 	fmtMoney, //金额格式化
 

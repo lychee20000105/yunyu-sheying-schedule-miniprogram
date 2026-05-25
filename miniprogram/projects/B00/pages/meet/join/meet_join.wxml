@@ -1,5 +1,17 @@
-<view wx:if="{{isLoad===null}}" class="margin-top load notexist text-l load-project"></view>
-<view wx:if="{{isLoad===false}}" class="margin-top load loading text-l load-project"></view>
+<view wx:if="{{isLoad===null}}" class="meet-state-page error">
+	<view class="meet-state-icon">
+		<text class="icon-warn"></text>
+	</view>
+	<view class="meet-state-title">预约信息不可用</view>
+	<view class="meet-state-desc">当前时段可能已取消或不存在，请返回后重新选择。</view>
+</view>
+<view wx:if="{{isLoad===false}}" class="meet-state-page loading">
+	<view class="meet-state-icon">
+		<text class="icon-loading"></text>
+	</view>
+	<view class="meet-state-title">正在加载预约信息</view>
+	<view class="meet-state-desc">请稍候，正在确认预约时段与表单。</view>
+</view>
 
 <view wx:if="{{isLoad&&isLogin}}" class="main padding-project">
 
@@ -25,7 +37,8 @@
 
 	</view>
 
-	<button bindtap="bindCheckTap" class="btn-base btn-project" style="margin-bottom:100rpx;">提交</button>
+	<button bindtap="bindCheckTap" loading="{{isSubmitting}}" disabled="{{isSubmitting}}" class="btn-base btn-project meet-submit-btn {{isSubmitting?'submitting':''}}" style="margin-bottom:100rpx;">{{isSubmitting?'提交中...':'提交'}}</button>
+	<view wx:if="{{isSubmitting}}" class="submit-status">正在提交预约，请勿重复操作</view>
 
 
 </view>

@@ -1,0 +1,7 @@
+<view class="page">
+	<view wx:if="{{list.length==0}}" class="empty">暂无消息</view>
+	<view wx:for="{{list}}" wx:key="_id" class="card {{item.MSG_IS_READ?'read':''}}">
+		<view class="title">{{item.MSG_TITLE}}</view>
+		<view class="content">{{item.MSG_CONTENT}}</view>
+	</view>
+</view>

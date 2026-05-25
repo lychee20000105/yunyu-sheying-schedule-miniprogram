@@ -1,6 +1,7 @@
 const AdminBiz = require('../../../../../../comm/biz/admin_biz.js');
 const pageHelper = require('../../../../../../helper/page_helper.js');
 const dataHelper = require('../../../../../../helper/data_helper.js');
+const contentCheckHelper = require('../../../../../../helper/content_check_helper.js');
 
 Page({
 
@@ -92,6 +93,31 @@ Page({
 			sourceType: ['album', 'camera'], //从相册选择
 			success: async (res) => {
 				let pic = res.tempFiles[0].tempFilePath;
+				let size = res.tempFiles[0].size;
+				wx.showLoading({
+					title: '图片校验中',
+					mask: true
+				});
+
+				if (!contentCheckHelper.imgTypeCheck(pic)) {
+					wx.hideLoading();
+					return pageHelper.showNoneToast('只能上传png、jpg、jpeg格式', 3000);
+				}
+
+				let maxSize = 20;
+				let imageMaxSize = 1024 * 1000 * maxSize;
+				if (!contentCheckHelper.imgSizeCheck(size, imageMaxSize)) {
+					wx.hideLoading();
+					return pageHelper.showModal('图片大小不能超过 ' + maxSize + '兆');
+				}
+
+				let check = await contentCheckHelper.imgCheck(pic);
+				if (!check) {
+					wx.hideLoading();
+					return pageHelper.showNoneToast('存在不合适的图片, 已屏蔽', 3000);
+				}
+
+				wx.hideLoading();
 				that.setData({
 					pic
 				});

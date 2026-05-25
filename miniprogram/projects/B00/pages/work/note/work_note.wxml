@@ -1,0 +1,19 @@
+<view class="page">
+	<view class="seg">
+		<view class="{{type=='all'?'active':''}}" bindtap="bindTypeTap" data-type="all">全部</view>
+		<view class="{{type=='team'?'active':''}}" bindtap="bindTypeTap" data-type="team">团队</view>
+		<view class="{{type=='personal'?'active':''}}" bindtap="bindTypeTap" data-type="personal">个人</view>
+	</view>
+
+	<view wx:if="{{list.length==0}}" class="empty">暂无小记</view>
+	<view wx:for="{{list}}" wx:key="_id" class="card" bindtap="url" data-url="../note_edit/work_note_edit?id={{item._id}}">
+		<view class="head">
+			<view class="title">{{item.NOTE_TITLE}}</view>
+			<view class="tag">{{item.NOTE_TYPE=='team'?'团队':'个人'}}</view>
+		</view>
+		<view class="content">{{item.NOTE_CONTENT}}</view>
+		<view class="meta">{{item.NOTE_CREATOR_NAME}} · {{item.NOTE_DATE}}</view>
+	</view>
+
+	<view class="fab" bindtap="url" data-url="../note_edit/work_note_edit">+</view>
+</view>

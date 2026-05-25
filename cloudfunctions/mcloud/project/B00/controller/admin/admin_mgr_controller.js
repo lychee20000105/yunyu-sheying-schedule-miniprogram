@@ -103,7 +103,7 @@ class AdminMgrController extends BaseProjectAdminController {
 		let rules = {
 			name: 'must|string|min:5|max:30|name=账号',
 			desc: 'must|string|max:30|name=姓名',
-			phone: 'string|len:11|name=手机',
+			phone: 'string|mobile|name=手机',
 			password: 'must|string|min:6|max:30|name=密码',
 		};
 
@@ -126,7 +126,7 @@ class AdminMgrController extends BaseProjectAdminController {
 			id: 'must|id|name=id',
 			name: 'must|string|min:5|max:30|name=账号',
 			desc: 'must|string|max:30|name=姓名',
-			phone: 'string|len:11|name=手机',
+			phone: 'string|mobile|name=手机',
 			password: 'string|min:6|max:30|name=新密码',
 
 		};

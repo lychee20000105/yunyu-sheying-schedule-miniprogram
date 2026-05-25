@@ -1,0 +1,11 @@
+<view class="page">
+	<view wx:if="{{list.length==0}}" class="empty">暂无取消订单</view>
+	<view wx:for="{{list}}" wx:key="_id" class="card">
+		<view class="title">{{item.ORDER_TYPE_NAME}}｜{{item.ORDER_CUSTOMER_NAME}}</view>
+		<view class="meta">{{item.ORDER_DATE}} {{item.ORDER_TIME}} ｜ {{item.ORDER_CANCEL_REASON}}</view>
+		<view class="actions">
+			<button class="restore" bindtap="bindRestoreTap" data-id="{{item._id}}">恢复</button>
+			<button bindtap="bindDelTap" data-id="{{item._id}}">彻底删除</button>
+		</view>
+	</view>
+</view>

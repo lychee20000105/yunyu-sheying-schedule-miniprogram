@@ -4,11 +4,10 @@
  * Date: 2025-09-05 04:00:00 
  */
 
+const PROJECT_PID = 'B00';
+
 function getProjectId() {
-	if (global.PID)
-		return global.PID;
-	else
-		return 'ONE';
+	return PROJECT_PID;
 }
 
 /**

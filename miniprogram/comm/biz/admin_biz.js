@@ -158,14 +158,14 @@ class AdminBiz extends BaseBiz {
 AdminBiz.CHECK_FORM_MGR_ADD = {
 	name: 'formName|must|string|min:5|max:30|name=账号',
 	desc: 'formDesc|must|string|max:30|name=姓名',
-	phone: 'formPhone|string|len:11|name=手机',
+	phone: 'formPhone|string|mobile|name=手机',
 	password: 'formPassword|must|string|min:6|max:30|name=密码',
 };
 
 AdminBiz.CHECK_FORM_MGR_EDIT = {
 	name: 'formName|must|string|min:5|max:30|name=账号',
 	desc: 'formDesc|must|string|max:30|name=姓名',
-	phone: 'formPhone|string|len:11|name=手机',
+	phone: 'formPhone|string|mobile|name=手机',
 	password: 'formPassword|string|min:6|max:30|name=新密码',
 };
 

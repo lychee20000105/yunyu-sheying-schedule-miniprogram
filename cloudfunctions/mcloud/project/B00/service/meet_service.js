@@ -12,6 +12,7 @@ const DayModel = require('../model/day_model.js');
 const LogUtil = require('../../../framework/utils/log_util.js');
 const timeUtil = require('../../../framework/utils/time_util.js');
 const dataUtil = require('../../../framework/utils/data_util.js');
+const dbUtil = require('../../../framework/database/db_util.js');
 const projectConfig = require('../public/project_config.js'); 
 const MEET_LOG_LEVEL = 'debug';
 
@@ -170,6 +171,8 @@ class MeetService extends BaseProjectService {
 		data.JOIN_STATUS = JoinModel.STATUS.SUCC;
 		data.JOIN_CODE = dataUtil.genRandomIntString(15);
 
+		await this.checkMeetLimitSet(userId, meet, timeMark);
+
 		// 入库
 		let joinId = await JoinModel.insert(data);
 
@@ -187,7 +190,8 @@ class MeetService extends BaseProjectService {
 		}
 
 		// 统计
-		this.statJoinCnt(meetId, timeMark);
+		await this.statJoinCnt(meetId, timeMark);
+		await this.checkMeetLimitSet(userId, meet, timeMark, 1);
 
 		return {
 			result: 'ok',
@@ -290,7 +294,7 @@ class MeetService extends BaseProjectService {
 
 
 	// 预约次数限制校验
-	async checkMeetLimitSet(userId, meet, timeMark) {
+	async checkMeetLimitSet(userId, meet, timeMark, maxCnt = 0) {
 		if (!meet) this.AppError('预约次数规则错误, 预约项目不存在');
 		let meetId = meet._id;
 
@@ -308,7 +312,7 @@ class MeetService extends BaseProjectService {
 		}
 		let cnt = await JoinModel.count(where);
 		this._meetLog(meet, `预约次数规则,mode=本时段可预约1次`, `当前已预约=${cnt}次`);
-		if (cnt >= 1) {
+		if (cnt > maxCnt) {
 			this.AppError(`您本时段已经预约，无须重复预约`);
 		}
 	}
@@ -615,9 +619,10 @@ class MeetService extends BaseProjectService {
 		console.log(typeId)
 		where.MEET_STATUS = ['in', [MeetModel.STATUS.COMM, MeetModel.STATUS.OVER]]; // 状态  
 
-		if (util.isDefined(search) && search) {
+		let safeSearch = dbUtil.fmtRegexKeyword(search);
+		if (safeSearch) {
 			where.MEET_TITLE = {
-				$regex: '.*' + search,
+				$regex: safeSearch,
 				$options: 'i'
 			};
 		} else if (sortType && util.isDefined(sortVal)) {
@@ -688,7 +693,7 @@ class MeetService extends BaseProjectService {
 			JOIN_IS_CHECKIN: 0,
 		}
 		await JoinModel.edit(where, data);
-		this.statJoinCnt(join.JOIN_MEET_ID, join.JOIN_MEET_TIME_MARK);
+		await this.statJoinCnt(join.JOIN_MEET_ID, join.JOIN_MEET_TIME_MARK);
 
 	}
 
@@ -727,9 +732,10 @@ class MeetService extends BaseProjectService {
 		};
 		//where.MEET_STATUS = ['in', [MeetModel.STATUS.COMM, MeetModel.STATUS.OVER]]; // 状态  
 
-		if (util.isDefined(search) && search) {
+		let safeSearch = dbUtil.fmtRegexKeyword(search);
+		if (safeSearch) {
 			where.JOIN_MEET_TITLE = {
-				$regex: '.*' + search,
+				$regex: safeSearch,
 				$options: 'i'
 			};
 		} else if (sortType) {

@@ -1,0 +1,121 @@
+<view class="page" wx:if="{{options}}">
+	<view class="block">
+		<view class="row">
+			<text class="label">日期时间 *</text>
+			<picker mode="date" value="{{order.ORDER_DATE}}" bindchange="bindDateChange">
+				<view class="value">{{order.ORDER_DATE || '请选择日期'}}</view>
+			</picker>
+		</view>
+		<view class="row">
+			<text class="label">开始时间</text>
+			<input class="input" value="{{order.ORDER_TIME}}" placeholder="如 13:00 / 下午" data-field="ORDER_TIME" bindinput="bindInput" />
+		</view>
+		<view class="row">
+			<text class="label">订单类型 *</text>
+			<picker range="{{options.types}}" range-key="TYPE_NAME" bindchange="bindTypeChange">
+				<view class="value">{{order.ORDER_TYPE_NAME || '请选择'}}</view>
+			</picker>
+		</view>
+		<view class="row">
+			<text class="label">订单状态</text>
+			<picker range="{{options.progressOptions}}" range-key="label" bindchange="bindProgressChange">
+				<view class="value">{{order.ORDER_PROGRESS_DESC || '已定档'}}</view>
+			</picker>
+		</view>
+	</view>
+
+	<view class="block">
+		<view class="row">
+			<text class="label">客户 *</text>
+			<input class="input" value="{{order.ORDER_CUSTOMER_NAME}}" placeholder="客户名称" data-field="ORDER_CUSTOMER_NAME" bindinput="bindInput" />
+		</view>
+		<view class="row">
+			<text class="label">电话</text>
+			<input class="input" value="{{order.ORDER_CUSTOMER_MOBILE}}" placeholder="联系人电话" data-field="ORDER_CUSTOMER_MOBILE" bindinput="bindInput" />
+		</view>
+		<view class="row">
+			<text class="label">拍摄内容</text>
+			<input class="input" value="{{order.ORDER_CONTENT}}" placeholder="服务内容" data-field="ORDER_CONTENT" bindinput="bindInput" />
+		</view>
+		<view class="row">
+			<text class="label">地点</text>
+			<input class="input" value="{{order.ORDER_PLACE}}" placeholder="相关地点" data-field="ORDER_PLACE" bindinput="bindInput" />
+		</view>
+		<view class="row">
+			<text class="label">客户来源</text>
+			<picker range="{{options.sources}}" bindchange="bindSourceChange">
+				<view class="value">{{order.ORDER_SOURCE || '请选择'}}</view>
+			</picker>
+		</view>
+		<view class="row">
+			<text class="label">老客户</text>
+			<switch checked="{{order.ORDER_IS_OLD_CUSTOMER==1}}" bindchange="bindOldChange" color="#ff2d62" />
+		</view>
+	</view>
+
+	<view class="block">
+		<view class="row">
+			<text class="label">订单金额</text>
+			<input class="input" type="digit" value="{{order.ORDER_AMOUNT}}" placeholder="登记订单金额" data-field="ORDER_AMOUNT" bindinput="bindInput" />
+		</view>
+		<view class="row">
+			<text class="label">定金</text>
+			<input class="input" type="digit" value="{{order.ORDER_DEPOSIT}}" placeholder="已收定金" data-field="ORDER_DEPOSIT" bindinput="bindInput" />
+		</view>
+		<view class="row">
+			<text class="label">尾款</text>
+			<input class="input" type="digit" value="{{order.ORDER_FINAL}}" placeholder="实际尾款" data-field="ORDER_FINAL" bindinput="bindInput" />
+		</view>
+		<view class="row">
+			<text class="label">后期加选/产品</text>
+			<input class="input" type="digit" value="{{order.ORDER_EXTRA}}" placeholder="加片、相册、产品等" data-field="ORDER_EXTRA" bindinput="bindInput" />
+		</view>
+	</view>
+
+	<view class="block">
+		<view class="block-head">
+			<text>参与人</text>
+			<view class="small-btn" bindtap="bindAddParticipantTap">添加</view>
+		</view>
+		<view wx:for="{{order.ORDER_PARTICIPANTS}}" wx:key="id" class="part">
+			<view class="part-line">
+				<picker range="{{options.staffList}}" range-key="STAFF_NAME" bindchange="bindPartStaffChange" data-idx="{{index}}">
+					<view class="part-value">{{item.staffName || '请选择员工'}}</view>
+				</picker>
+				<picker range="{{options.roles}}" bindchange="bindPartRoleChange" data-idx="{{index}}">
+					<view class="part-value">{{item.roleName}}</view>
+				</picker>
+				<view class="del" bindtap="bindDelParticipantTap" data-idx="{{index}}">删除</view>
+			</view>
+			<view class="part-line">
+				<picker range="{{options.calcModes}}" range-key="label" bindchange="bindPartModeChange" data-idx="{{index}}">
+					<view class="part-value">{{item.calcMode=='manual'?'手动金额':item.calcMode=='fixed'?'固定金额':item.calcMode=='none'?'不计提成':'按比例'}}</view>
+				</picker>
+				<input wx:if="{{item.calcMode=='manual'}}" class="part-input" type="digit" value="{{item.manualAmount}}" placeholder="提成金额" bindinput="bindPartManualInput" data-idx="{{index}}" />
+				<view wx:else class="part-hint">按员工岗位规则计算</view>
+			</view>
+			<view wx:if="{{item.amount || item.amount==0}}" class="part-amount">我的可见提成：{{item.amount}}</view>
+		</view>
+		<view wx:if="{{order.ORDER_PARTICIPANTS.length==0}}" class="muted">未添加参与人</view>
+	</view>
+
+	<view class="block">
+		<view class="block-head">
+			<text>附件</text>
+			<view class="small-btn" bindtap="bindChooseImageTap">上传</view>
+		</view>
+		<view class="imgs">
+			<view wx:for="{{imgList}}" wx:key="*this" class="img-wrap">
+				<image src="{{item}}" mode="aspectFill" />
+				<view class="img-del" bindtap="bindDelImageTap" data-idx="{{index}}">×</view>
+			</view>
+		</view>
+	</view>
+
+	<view class="actions">
+		<button class="save" loading="{{isSaving}}" disabled="{{isSaving}}" bindtap="bindSubmitTap">保存</button>
+		<button wx:if="{{order.ORDER_STATUS!=10}}" class="complete" bindtap="bindCompleteTap">订单完成</button>
+		<button wx:if="{{id && order.ORDER_STATUS!=10}}" class="cancel" bindtap="bindCancelTap">取消订单</button>
+		<button wx:if="{{id && order.ORDER_STATUS==10}}" class="complete" bindtap="bindRestoreTap">恢复订单</button>
+	</view>
+</view>

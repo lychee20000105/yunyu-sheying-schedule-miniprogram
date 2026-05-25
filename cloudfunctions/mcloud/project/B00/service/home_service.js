@@ -7,9 +7,15 @@
 const BaseProjectService = require('./base_project_service.js'); 
 const setupUtil = require('../../../framework/utils/setup/setup_util.js'); 
 
+const PUBLIC_SETUP_KEYS = new Set([
+	'SETUP_ABOUT_KEY',
+]);
+
 class HomeService extends BaseProjectService {
 
 	async getSetup(key) {
+		if (!PUBLIC_SETUP_KEYS.has(key)) this.AppError('设置项不可访问');
+
 		return await setupUtil.get(key);
 	}
   

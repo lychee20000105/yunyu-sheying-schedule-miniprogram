@@ -10,8 +10,6 @@ const timeHelper = require('../../../../../helper/time_helper.js');
 const ProjectBiz = require('../../../biz/project_biz.js');
 const PublicBiz = require('../../../../../comm/biz/public_biz.js');
 const PassportBiz = require('../../../../../comm/biz/passport_biz.js');
-const AdminBiz = require('../../../../../comm/biz/admin_biz.js');
-const setting = require('../../../../../setting/setting.js');
 
 Page({
 	data: {
@@ -125,13 +123,9 @@ Page({
 				}
 
 				if (idx == 1) {
-					if (setting.IS_SUB) {
-						AdminBiz.adminLogin(this, 'admin', '123456');
-					} else {
-						wx.reLaunch({
-							url: '../../admin/index/login/admin_login',
-						});
-					}
+					wx.reLaunch({
+						url: '../../admin/index/login/admin_login',
+					});
 
 				}
 

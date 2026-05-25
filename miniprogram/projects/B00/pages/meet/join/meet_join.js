@@ -16,6 +16,7 @@ Page({
 
 		forms: [],
 		isAdminAdd: false,
+		isSubmitting: false,
 	},
 
 	/**
@@ -116,10 +117,16 @@ Page({
 	},
 
 	bindCheckTap: async function (e) {
+		if (this.data.isSubmitting) return;
 		this.selectComponent("#form-show").checkForms();
 	},
 
 	bindSubmitCmpt: async function (e) {
+		if (this.data.isSubmitting) return;
+		this.setData({
+			isSubmitting: true
+		});
+		let isSubmitSucc = false;
 		let forms = e.detail;
 
 		let callback = async () => {
@@ -134,6 +141,7 @@ Page({
 				}
 				let route = this.data.isAdminAdd ? 'admin/meet_join_insert' : 'meet/join';
 				await cloudHelper.callCloudSumbit(route, params, opts).then(res => {
+					isSubmitSucc = true;
 					let content = this.data.isAdminAdd ? '订单添加成功！' : '预约成功！'
 
 					let joinId = res.data.joinId;
@@ -144,10 +152,21 @@ Page({
 						success: () => {
 							let ck = () => {
 								if (this.data.isAdminAdd) {
-									wx.navigateBack();
+									wx.navigateBack({
+										fail: () => {
+											this.setData({
+												isSubmitting: false
+											});
+										}
+									});
 								} else {
 									wx.reLaunch({
 										url: pageHelper.fmtURLByPID('/pages/meet/my_join_detail/meet_my_join_detail?flag=home&id=' + joinId),
+										fail: () => {
+											this.setData({
+												isSubmitting: false
+											});
+										}
 									})
 								}
 							}
@@ -160,11 +179,19 @@ Page({
 			};
 		}
 
-		if (this.data.isAdminAdd) {
-			await callback();
-		} else {
+		try {
+			if (this.data.isAdminAdd) {
+				await callback();
+			} else {
 			// 消息订阅
-			await MeetBiz.subscribeMessageMeet(callback);
+				await MeetBiz.subscribeMessageMeet(callback);
+			}
+		} finally {
+			if (!isSubmitSucc) {
+				this.setData({
+					isSubmitting: false
+				});
+			}
 		}
 
 	}

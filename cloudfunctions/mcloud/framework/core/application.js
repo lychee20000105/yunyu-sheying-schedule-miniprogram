@@ -10,7 +10,18 @@ const appUtil = require('./app_util.js');
 const appCode = require('./app_code.js');
 const appOther = require('./app_other.js');
 const config = require('../../config/config.js');
-global.PID = 'unknown';
+
+const PROJECT_PID = 'B00';
+const PROJECT_ROUTES = {
+	[PROJECT_PID]: () => require('project/B00/public/route.js')
+};
+const PROJECT_CONTROLLERS = {
+	[PROJECT_PID]: (controllerName) => require('project/B00/controller/' + controllerName + '.js')
+};
+
+function checkProjectPid(pid) {
+	return pid === PROJECT_PID;
+}
 
 async function app(event, context) {
 
@@ -26,6 +37,9 @@ async function app(event, context) {
 	const wxContext = cloud.getWXContext();
 	let r = '';
 	let PID = '';
+	let controllerName = '';
+	let actionName = '';
+	let timeTicks = timeUtil.time();
 	try {
 
 		if (!util.isDefined(event.route)) {
@@ -41,16 +55,15 @@ async function app(event, context) {
 			return appUtil.handlerSvrErr();
 		}
 
-		PID = event.PID.trim();
-		if (!PID) {
+		PID = String(event.PID || '').trim();
+		if (!checkProjectPid(PID)) {
 			showEvent(event);
-			console.error('PID Is NULL]');
-			return appUtil.handlerSvrErr();
+			console.error('PID Not Allowed');
+			return appUtil.handlerAppErr('PID Not Allowed', appCode.LOGIC);
 		}
-		global.PID = PID;
 
 		// 路由不存在
-		routes = require('project/' + PID + '/public/route.js');
+		const routes = PROJECT_ROUTES[PID]();
 		if (!util.isDefined(routes[r])) {
 			showEvent(event);
 			console.error('Route [' + r + '] Is Not Exist');
@@ -59,8 +72,8 @@ async function app(event, context) {
 
 		let routesArr = routes[r].split('@');
 
-		let controllerName = routesArr[0];
-		let actionName = routesArr[1];
+		controllerName = routesArr[0];
+		actionName = routesArr[1];
 
 		// 事前处理
 		if (actionName.includes('#')) {
@@ -75,17 +88,17 @@ async function app(event, context) {
 		console.log('');
 		console.log('');
 		let time = timeUtil.time('Y-M-D h:m:s');
-		let timeTicks = timeUtil.time();
+		timeTicks = timeUtil.time();
 		let openId = wxContext.OPENID;
 
 		console.log('▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤');
-		console.log(`【↘${time} ENV (${config.CLOUD_ID})】【Request Base↘↘↘】\n【↘Route =***${r}】\n【↘Controller = ${controllerName}】\n【↘Action = ${actionName}】\n【↘OPENID = ${openId}】\n【↘PID = ${global.PID}】`);
+		console.log(`【↘${time} ENV (${config.CLOUD_ID})】【Request Base↘↘↘】\n【↘Route =***${r}】\n【↘Controller = ${controllerName}】\n【↘Action = ${actionName}】`);
 
 
 
 		// 引入逻辑controller 
 		controllerName = controllerName.toLowerCase().trim();
-		const ControllerClass = require('project/'+PID +'/controller/' + controllerName + '.js');
+		const ControllerClass = PROJECT_CONTROLLERS[PID](controllerName);
 		const controller = new ControllerClass(r, openId, event);
  
 		// 调用方法    
@@ -107,7 +120,7 @@ async function app(event, context) {
 		console.log('------');
 		time = timeUtil.time('Y-M-D h:m:s');
 		timeTicks = timeUtil.time() - timeTicks;
-		console.log(`【${time}】【Return Base↗↗↗】\n【↗Route =***${r}】\n【↗Duration = ${timeTicks}ms】\n【↗↗OUT DATA】= `, result);
+		console.log(`【${time}】【Return Base↗↗↗】\n【↗Route =***${r}】\n【↗Controller = ${controllerName}】\n【↗Action = ${actionName}】\n【↗Duration = ${timeTicks}ms】`);
 		console.log('▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦▦');
 		console.log('');
 		console.log('');
@@ -120,7 +133,8 @@ async function app(event, context) {
 
 		console.log('------');
 		time = timeUtil.time('Y-M-D h:m:s');
-		console.error(`【${time}】【Return Base↗↗↗】\n【↗Route = ${r}】\Exception MSG = ${ex.message}, CODE=${ex.code}`);
+		timeTicks = timeUtil.time() - timeTicks;
+		console.error(`【${time}】【Return Base↗↗↗】\n【↗Route = ${r}】\n【↗Controller = ${controllerName}】\n【↗Action = ${actionName}】\n【↗Duration = ${timeTicks}ms】\n【↗Exception MSG = ${ex.message}, CODE=${ex.code}】`);
 
 		// 系统级错误定位调试
 		if (config.TEST_MODE && ex.name != 'AppError') throw ex;
@@ -165,7 +179,10 @@ function beforeApp(method) {
 
 // 展示当前输入数据
 function showEvent(event) {
-	console.log(event);
+	console.log({
+		route: event && event.route,
+		PID: event && event.PID
+	});
 }
 
 module.exports = {

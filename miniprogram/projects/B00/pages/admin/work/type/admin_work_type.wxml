@@ -1,0 +1,19 @@
+<view class="page">
+	<view class="block">
+		<view class="head"><text>{{form._id?'编辑类型':'新增类型'}}</text><view bindtap="bindNewTap">清空</view></view>
+		<view class="row"><text>名称</text><input value="{{form.TYPE_NAME}}" data-field="TYPE_NAME" bindinput="bindInput" /></view>
+		<view class="row"><text>排序</text><input type="number" value="{{form.TYPE_ORDER}}" data-field="TYPE_ORDER" bindinput="bindInput" /></view>
+		<view class="switches">
+			<view>启用 <switch checked="{{form.TYPE_STATUS==1}}" bindchange="bindStatusChange" color="#ff2d62" /></view>
+			<view>其他类目 <switch checked="{{form.TYPE_IS_OTHER==1}}" bindchange="bindOtherChange" color="#ff2d62" /></view>
+		</view>
+		<view class="colors">
+			<view wx:for="{{colors}}" wx:key="*this" style="background:{{item}}" class="{{form.TYPE_COLOR==item?'on':''}}" data-color="{{item}}" bindtap="bindColorTap"></view>
+		</view>
+		<button class="submit" bindtap="bindSubmitTap">保存类型</button>
+	</view>
+	<view wx:for="{{list}}" wx:key="_id" class="card" bindtap="bindEditTap" data-idx="{{index}}">
+		<view class="tag" style="background:{{item.TYPE_COLOR}}">{{item.TYPE_NAME}}</view>
+		<view class="meta">排序 {{item.TYPE_ORDER}} {{item.TYPE_STATUS==1?'启用':'停用'}}</view>
+	</view>
+</view>

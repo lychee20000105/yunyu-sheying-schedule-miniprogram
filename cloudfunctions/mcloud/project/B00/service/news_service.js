@@ -6,6 +6,7 @@
 
 const BaseProjectService = require('./base_project_service.js');
 const util = require('../../../framework/utils/util.js');
+const dbUtil = require('../../../framework/database/db_util.js');
 const NewsModel = require('../model/news_model.js');
 
 class NewsService extends BaseProjectService {
@@ -52,9 +53,10 @@ class NewsService extends BaseProjectService {
 
 		if (cateId && cateId !== '0') where.NEWS_CATE_ID = cateId;
 
-		if (util.isDefined(search) && search) {
+		let safeSearch = dbUtil.fmtRegexKeyword(search);
+		if (safeSearch) {
 			where.NEWS_TITLE = {
-				$regex: '.*' + search,
+				$regex: safeSearch,
 				$options: 'i'
 			};
 		} else if (sortType && util.isDefined(sortVal)) {

@@ -1,7 +1,7 @@
  /**
   * Notes: 基础控制器
   * Ver : CCMiniCloud Framework 2.0.4 ALL RIGHTS RESERVED BY cclinUx0730 (wechat)
-  * Date: 2025-09-05 04:00:00 
+  * Date: 2025-09-05 04:00:00
   */
 
  const config = require('../../../config/config.js');
@@ -11,52 +11,52 @@
 
  class BaseController {
 
- 	constructor(route, openId, event) {
- 		this._route = route; // 路由
- 		this._openId = openId; //用户身份
- 		this._event = event; // 所有参数   
- 		this._request = event.params; //数据参数
+	constructor(route, openId, event) {
+		this._route = route; // 路由
+		this._openId = openId; //用户身份
+		this._event = event; // 所有参数
+		this._request = event.params; //数据参数
 
- 		// 测试模式
- 		if (config.TEST_MODE)
- 			openId = config.TEST_TOKEN_ID;
+		// 测试模式
+		if (config.TEST_MODE)
+			openId = config.TEST_TOKEN_ID;
 
- 		if (!openId) {
- 			console.error('OPENID is unfined');
- 			throw new AppError('OPENID is unfined', appCode.SVR);
- 		}
+		if (!openId) {
+			console.error('OPENID is unfined');
+			throw new AppError('OPENID is unfined', appCode.SVR);
+		}
 
- 		let userId = openId;
+		let userId = openId;
 
- 		this._token = event.token || '';
- 		this._userId = userId;
+		this._token = event.token || '';
+		this._userId = userId;
 
- 		// 当前时间戳
- 		this._timestamp = timeUtil.time();
- 		let time = timeUtil.time('Y-M-D h:m:s');
+		// 当前时间戳
+		this._timestamp = timeUtil.time();
+		let time = timeUtil.time('Y-M-D h:m:s');
 
- 		console.log('------------------------');
- 		console.log(`【${time}】【Request -- ↘↘↘】\n【↘Token = ${this._token}】\n【↘USER-ID = ${userId}】\n【↘↘IN DATA】=\n`, JSON.stringify(this._request, null, 4));
+		console.log('------------------------');
+		console.log(`【${time}】【Request -- ↘↘↘】\n【↘Route = ${this._route}】`);
 
- 	}
+	}
 
- 	/**
- 	 * 数据校验
- 	 * @param {*} rules 
- 	 */
- 	validateData(rules = {}) {
- 		let input = this._request;
- 		return dataCheck.check(input, rules);
- 	}
+	/**
+	 * 数据校验
+	 * @param {*} rules
+	 */
+	validateData(rules = {}) {
+		let input = this._request;
+		return dataCheck.check(input, rules);
+	}
 
- 	// 取得某个具体的参数值
- 	getParameter(name) {
- 		let input = this._request;
- 		if (util.isDefined(input[name]))
- 			return input[name];
- 		else
- 			return '';
- 	}
+	// 取得某个具体的参数值
+	getParameter(name) {
+		let input = this._request;
+		if (util.isDefined(input[name]))
+			return input[name];
+		else
+			return '';
+	}
  }
 
  module.exports = BaseController;

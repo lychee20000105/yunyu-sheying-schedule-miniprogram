@@ -34,6 +34,26 @@ module.exports = {
 	'product/list': 'product_controller@getProductList',
 	'product/view': 'product_controller@viewProduct',
 
+	// 内部工作台
+	'work/me': 'work_controller@getMe',
+	'work/bind_staff': 'work_controller@bindStaff',
+	'work/options': 'work_controller@getOptions',
+	'work/calendar': 'work_controller@getCalendar',
+	'work/day_list': 'work_controller@getDayList',
+	'work/order_detail': 'work_controller@getOrderDetail',
+	'work/order_save': 'work_controller@saveOrder',
+	'work/order_complete': 'work_controller@completeOrder',
+	'work/order_cancel': 'work_controller@cancelOrder',
+	'work/order_restore': 'work_controller@restoreOrder',
+	'work/note_list': 'work_controller@getNoteList',
+	'work/note_detail': 'work_controller@getNoteDetail',
+	'work/note_save': 'work_controller@saveNote',
+	'work/item_save': 'work_controller@saveItem',
+	'work/rest_save': 'work_controller@saveRest',
+	'work/messages': 'work_controller@getMessages',
+	'work/message_read': 'work_controller@readMessage',
+	'work/my_payroll': 'work_controller@getMyPayroll',
+
 	// 预约
 	'meet/list': 'meet_controller@getMeetList',
 	'meet/list_by_day': 'meet_controller@getMeetListByDay',
@@ -64,6 +84,7 @@ module.exports = {
 	'admin/log_list': 'admin/admin_mgr_controller@getLogList',
 	'admin/log_clear': 'admin/admin_mgr_controller@clearLog#demo',
 
+	'admin/setup_get': 'admin/admin_setup_controller@getSetup',
 	'admin/setup_set': 'admin/admin_setup_controller@setSetup#demo',
 	'admin/setup_set_content': 'admin/admin_setup_controller@setContentSetup#demo',
 	'admin/setup_qr': 'admin/admin_setup_controller@genMiniQr',
@@ -76,6 +97,22 @@ module.exports = {
 	'admin/user_data_get': 'admin/admin_user_controller@userDataGet',
 	'admin/user_data_export': 'admin/admin_user_controller@userDataExport',
 	'admin/user_data_del': 'admin/admin_user_controller@userDataDel',
+
+	// 内部工作台
+	'admin/work_staff_list': 'admin/admin_work_controller@getStaffList',
+	'admin/work_staff_save': 'admin/admin_work_controller@saveStaff#demo',
+	'admin/work_staff_status': 'admin/admin_work_controller@stopStaff#demo',
+	'admin/work_type_list': 'admin/admin_work_controller@getTypeList',
+	'admin/work_type_save': 'admin/admin_work_controller@saveType#demo',
+	'admin/work_audit_list': 'admin/admin_work_controller@getAuditList',
+	'admin/work_audit_order': 'admin/admin_work_controller@auditOrder#demo',
+	'admin/work_audit_item': 'admin/admin_work_controller@auditItem#demo',
+	'admin/work_audit_rest': 'admin/admin_work_controller@auditRest#demo',
+	'admin/work_payroll': 'admin/admin_work_controller@getPayroll',
+	'admin/work_payroll_pay': 'admin/admin_work_controller@payStaffMonth#demo',
+	'admin/work_canceled_orders': 'admin/admin_work_controller@getCanceledOrders',
+	'admin/work_order_restore': 'admin/admin_work_controller@restoreOrder#demo',
+	'admin/work_order_del': 'admin/admin_work_controller@delOrder#demo',
 
 
 	// 内容

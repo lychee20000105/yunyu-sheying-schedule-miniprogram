@@ -1,0 +1,9 @@
+page { background: #f6f7f9; }
+.page { padding: 24rpx; }
+.block { background: #fff; border-radius: 12rpx; padding: 8rpx 26rpx; }
+.row { min-height: 96rpx; display: flex; align-items: center; justify-content: space-between; border-bottom: 1rpx solid #f0f2f5; font-size: 30rpx; }
+.row input { text-align: right; }
+.label { font-weight: 800; }
+.area { padding: 28rpx 0; }
+.area textarea { width: 100%; height: 240rpx; margin-top: 24rpx; background: #f6f7f9; border-radius: 10rpx; padding: 20rpx; box-sizing: border-box; }
+.submit { margin-top: 40rpx; height: 88rpx; line-height: 88rpx; border-radius: 44rpx; background: #ff2d62; color: #fff; font-weight: 800; }

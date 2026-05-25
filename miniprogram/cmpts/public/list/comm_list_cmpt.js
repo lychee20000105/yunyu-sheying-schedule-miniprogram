@@ -130,6 +130,7 @@ Component({
 	 * 组件的初始数据
 	 */
 	data: {
+		isLoading: false,
 		refresherTriggered: false, //下拉刷新是否完成
 
 		sortItems: [], //下拉
@@ -208,8 +209,16 @@ Component({
 		reload: async function () {
 			await this._getList(1);
 		},
+		_getListKey: function (page, params) {
+			return JSON.stringify({
+				route: this.data.route,
+				page,
+				params
+			});
+		},
 		// 数据列表
 		_getList: async function (page) {
+			page = Number(page) || 1;
 			let params = {
 				page: page,
 				...this.data._params
@@ -226,6 +235,20 @@ Component({
 				params.sortVal = this.data.sortVal;
 			}
 
+			let listKey = this._getListKey(page, params);
+			if (this._listLoading) {
+				if (listKey != this._listLoadingKey || !this.data._dataList)
+					this._pendingListPage = page;
+				return;
+			}
+
+			this._listLoading = true;
+			this._listLoadingKey = listKey;
+			this.setData({
+				isLoading: true
+			});
+
+			try {
 			//if (page == 1 && !this.data._dataList) { TODO???
 			if (page == 1) {
 				this.triggerEvent('list', {
@@ -247,11 +270,24 @@ Component({
 			if (this.data.isCache)
 				PublicBiz.setCacheList(this.data.type);
 			if (page == 1) this.bindTopTap();
+			} finally {
+				let pendingPage = this._pendingListPage;
+				this._pendingListPage = null;
+				this._listLoading = false;
+				this._listLoadingKey = '';
+				this.setData({
+					isLoading: false
+				});
+				if (pendingPage)
+					await this._getList(pendingPage);
+			}
 
 
 		},
 
 		bindReachBottom: function () {
+			if (this._listLoading || this.data.isLoading || !this.data._dataList)
+				return;
 			// 上拉触底 
 			this._getList(this.data._dataList.page + 1);
 		},
@@ -261,10 +297,13 @@ Component({
 			this.setData({
 				refresherTriggered: true
 			});
-			await this._getList(1);
-			this.setData({
-				refresherTriggered: false
-			});
+			try {
+				await this._getList(1);
+			} finally {
+				this.setData({
+					refresherTriggered: false
+				});
+			}
 
 		},
 

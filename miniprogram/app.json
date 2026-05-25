@@ -1,5 +1,15 @@
 {
 	"pages": [
+		"projects/B00/pages/work/calendar/work_calendar",
+		"projects/B00/pages/work/add/work_add",
+		"projects/B00/pages/work/order_edit/work_order_edit",
+		"projects/B00/pages/work/item_edit/work_item_edit",
+		"projects/B00/pages/work/rest_edit/work_rest_edit",
+		"projects/B00/pages/work/note/work_note",
+		"projects/B00/pages/work/note_edit/work_note_edit",
+		"projects/B00/pages/work/messages/work_messages",
+		"projects/B00/pages/work/my/work_my",
+		"projects/B00/pages/work/payroll/work_payroll",
 		"projects/B00/pages/default/index/default_index",
 		"projects/B00/pages/about/index/about_index",
 		"projects/B00/pages/product/detail/product_detail",
@@ -43,6 +53,11 @@
 		"projects/B00/pages/admin/setup/about/admin_setup_about",
 		"projects/B00/pages/admin/setup/qr/admin_setup_qr",
 		"projects/B00/pages/admin/setup/wecom/admin_setup_wecom",
+		"projects/B00/pages/admin/work/staff/admin_work_staff",
+		"projects/B00/pages/admin/work/type/admin_work_type",
+		"projects/B00/pages/admin/work/audit/admin_work_audit",
+		"projects/B00/pages/admin/work/payroll/admin_work_payroll",
+		"projects/B00/pages/admin/work/canceled/admin_work_canceled",
 		"projects/B00/pages/admin/user/list/admin_user_list",
 		"projects/B00/pages/admin/user/detail/admin_user_detail",
 		"projects/B00/pages/admin/user/export/admin_user_export",
@@ -57,8 +72,7 @@
 		"projects/B00/pages/admin/product/add/admin_product_add",
 		"projects/B00/pages/admin/product/edit/admin_product_edit",
 		"cmpts/public/form/form_set/field/form_set_field",
-		"cmpts/public/form/form_show/content/form_show_content",
-		"pages/test1/test1"
+		"cmpts/public/form/form_show/content/form_show_content"
 	],
 	"window": {
 		"backgroundColor": "#f1f1f1",
@@ -74,19 +88,31 @@
 		"selectedColor": "#ff6b6b",
 		"list": [
 			{
-				"pagePath": "projects/B00/pages/admin/meet/list/admin_meet_list",
+				"pagePath": "projects/B00/pages/work/calendar/work_calendar",
 				"text": "档期",
 				"iconPath": "/projects/B00/images/tabbar/day.png",
 				"selectedIconPath": "/projects/B00/images/tabbar/day_cur.png"
 			},
 			{
-				"pagePath": "projects/B00/pages/meet/calendar/meet_calendar",
-				"text": "日历",
+				"pagePath": "projects/B00/pages/work/note/work_note",
+				"text": "小记",
 				"iconPath": "/projects/B00/images/tabbar/album.png",
 				"selectedIconPath": "/projects/B00/images/tabbar/album_cur.png"
 			},
 			{
-				"pagePath": "projects/B00/pages/my/index/my_index",
+				"pagePath": "projects/B00/pages/work/add/work_add",
+				"text": "新增",
+				"iconPath": "/projects/B00/images/tabbar/product.png",
+				"selectedIconPath": "/projects/B00/images/tabbar/product_cur.png"
+			},
+			{
+				"pagePath": "projects/B00/pages/work/messages/work_messages",
+				"text": "消息",
+				"iconPath": "/projects/B00/images/tabbar/home.png",
+				"selectedIconPath": "/projects/B00/images/tabbar/home_cur.png"
+			},
+			{
+				"pagePath": "projects/B00/pages/work/my/work_my",
 				"text": "我的",
 				"iconPath": "/projects/B00/images/tabbar/my.png",
 				"selectedIconPath": "/projects/B00/images/tabbar/my_cur.png"

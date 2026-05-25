@@ -1,0 +1,18 @@
+page { background: #f6f7f9; }
+.page { padding: 24rpx; }
+.filters { display: grid; grid-template-columns: 1fr 1fr; gap: 16rpx; margin-bottom: 20rpx; }
+.filters view { background: #fff; border-radius: 12rpx; height: 84rpx; line-height: 84rpx; text-align: center; font-weight: 900; }
+.summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14rpx; margin-bottom: 22rpx; }
+.summary>view { background: #fff; border-radius: 12rpx; padding: 22rpx 12rpx; text-align: center; }
+.summary text { color: #8b9099; font-size: 22rpx; }
+.summary view view { margin-top: 10rpx; font-size: 34rpx; font-weight: 900; }
+.block,.card { background: #fff; border-radius: 12rpx; padding: 26rpx; margin-bottom: 20rpx; }
+.row { min-height: 82rpx; display: flex; align-items: center; justify-content: space-between; border-bottom: 1rpx solid #f0f2f5; }
+.row text { font-weight: 800; }
+.row input { text-align: right; }
+.pay { margin-top: 24rpx; height: 84rpx; line-height: 84rpx; border-radius: 42rpx; background: #ff2d62; color: #fff; font-weight: 800; }
+.section { font-size: 34rpx; font-weight: 900; margin: 28rpx 0 16rpx; }
+.card { position: relative; }
+.title { font-size: 30rpx; font-weight: 900; padding-right: 150rpx; }
+.meta { color: #8b9099; margin-top: 12rpx; }
+.amount { position: absolute; right: 26rpx; top: 28rpx; color: #ff2d62; font-size: 34rpx; font-weight: 900; }

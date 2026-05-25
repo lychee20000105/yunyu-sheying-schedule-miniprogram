@@ -40,6 +40,14 @@ page {
 	background-color: #cce6ff !important;
 }
 
+.btn.bg-admin.light,
+.btn.bg-blue.light,
+.btn-admin.bg-admin.light,
+.btn-admin.bg-blue.light {
+	border-color: rgba(36, 153, 242, 0.14);
+	box-shadow: none;
+}
+
 .border-admin,
 .border-blue {
 	border-color: var(--adminColor) !important;
@@ -289,13 +297,17 @@ page {
 	border-radius: 8rpx !important;
 	line-height: unset;
 	height: 55rpx !important;
-	background-color: #eee !important;
+	background-color: #f6f7f9 !important;
+	color: #5b6472 !important;
+	border: 1rpx solid rgba(15, 23, 42, 0.08);
+	box-shadow: none;
 	margin-bottom: 20rpx;
 }
 
 .admin-comm-list .btn-more {
 	background-color: #fadbd9 !important;
-	color: #e54d42;
+	color: #e54d42 !important;
+	border-color: rgba(229, 77, 66, 0.14);
 }
 
 .btn-admin {
@@ -305,20 +317,32 @@ page {
 	justify-content: center;
 	box-sizing: border-box;
 	font-size: 32rpx;
-	line-height: 2.5;
+	line-height: 80rpx;
+	height: 80rpx;
 	background-color: var(--adminColor) !important;
 	color: #fff;
-	border-radius: 40rpx;
+	border-radius: 12rpx;
 	margin-bottom: 60rpx;
+	font-weight: 600;
+	border: 1rpx solid transparent;
+	box-shadow: 0 4rpx 12rpx rgba(36, 153, 242, 0.16);
+	transition: opacity 0.16s ease, transform 0.16s ease, box-shadow 0.16s ease;
+	overflow: hidden;
 }
 
 .btn-admin.button-hover {
-	opacity: .9;
-	transform: scale(0.95, 0.95);
-	position: relative;
-	top: 3rpx;
-	left: 3rpx;
-	box-shadow: 0px 0px 8px rgba(0, 0, 0, .1) inset;
+	opacity: .88;
+	transform: translateY(1rpx);
+	top: 0;
+	left: 0;
+	box-shadow: 0 2rpx 8rpx rgba(15, 23, 42, 0.12) inset;
+}
+
+.btn-admin[disabled],
+.btn-admin.loading,
+.btn-admin.submitting {
+	opacity: .72;
+	box-shadow: none;
 }
 
 .btn-bottom-admin {

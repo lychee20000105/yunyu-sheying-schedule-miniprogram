@@ -10,6 +10,19 @@ const contentCheck = require('../../../../framework/validate/content_check.js');
 
 class AdminSetupController extends BaseProjectAdminController {
 
+	async getSetup() {
+		await this.isAdmin();
+
+		let rules = {
+			key: 'must|string|name=KEY',
+		};
+
+		let input = this.validateData(rules);
+
+		let service = new AdminSetupService();
+		return await service.getSetup(input.key);
+	}
+
 	// 通用sys
 	async setSetup() {
 		await this.isAdmin();
